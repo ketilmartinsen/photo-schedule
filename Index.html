@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📸 Photo Schedule</title>
+  <style>
+    :root {
+      --bg:        #0f0f0f;
+      --surface:   #1a1a1a;
+      --surface2:  #242424;
+      --border:    #333;
+      --accent:    #e8a020;
+      --accent2:   #c07010;
+      --text:      #e8e8e8;
+      --muted:     #888;
+      --danger:    #c0392b;
+      --ok:        #27ae60;
+      --applied:   #2980b9;
+      --done:      #555;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+      border-bottom: 2px solid var(--accent);
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+    header h1 span { color: var(--text); font-weight: 300; }
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ── Buttons ── */
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: #333; }
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-edit {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    .btn-edit:hover { background: var(--accent); color: #000; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      padding: 14px 28px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .toolbar input[type="text"] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 13px;
+      width: 220px;
+    }
+    .toolbar input[type="text"]::placeholder { color: var(--muted); }
+    .filter-label { color: var(--muted); font-size: 12px; margin-left: 8px; }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill {
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+    .pill.active, .pill:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Table wrapper ── */
+    .table-wrap {
+      overflow-x: auto;
+      padding: 20px 28px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+
+    thead tr {
+      background: var(--surface2);
+      text-align: left;
+    }
+    th {
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    tbody tr:hover { background: var(--surface2); }
+
+    td {
+      padding: 9px 12px;
+      vertical-align: middle;
+      color: var(--text);
+    }
+
+    .td-actions { display: flex; gap: 6px; white-space: nowrap; }
+
+    /* ── Status badges ── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-apply   { background: #3d2200; color: #e8a020; border: 1px solid #e8a020; }
+    .badge-applied { background: #0a2540; color: #5dade2; border: 1px solid #2980b9; }
+    .badge-ok      { background: #0a2e1a; color: #58d68d; border: 1px solid #27ae60; }
+    .badge-done    { background: #222;    color: #888;    border: 1px solid #555; }
+
+    .type-concert  { color: #e056fd; font-weight: 600; }
+    .type-football { color: #00cec9; font-weight: 600; }
+    .type-various  { color: #a0aec0; font-weight: 600; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 16px; }
+
+    /* ── Stats bar ── */
+    .stats {
+      display: flex;
+      gap: 20px;
+      padding: 0 28px 14px;
+      flex-wrap: wrap;
+    }
+    .stat { font-size: 12px; color: var(--muted); }
+    .stat strong { color: var(--text); }
+
+    /* ── Modal overlay ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 28px;
+      width: 560px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h2 {
+      font-size: 17px;
+      margin-bottom: 20px;
+      color: var(--accent);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+
+    input[type="date"],
+    input[type="text"],
+    select,
+    textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      width: 100%;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    select option { background: var(--surface2); }
+    textarea { resize: vertical; min-height: 60px; }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header, .toolbar, .table-wrap, .stats { padding-left: 14px; padding-right: 14px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <h1>📸 <span>Photo</span>Schedule</h1>
+  <div class="header-actions">
+    <button class="btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn-primary" onclick="openModal()">＋ Add Event</button>
+  </div>
+</header>
+
+<!-- ── Toolbar ── -->
+<div class="toolbar">
+  <input type="text" id="search" placeholder="🔍 Search events…" oninput="renderTable()">
+  <span class="filter-label">Filter:</span>
+  <div class="filter-pills">
+    <button class="pill active" data-filter="all"    onclick="setFilter('all',this)">All</button>
+    <button class="pill"        data-filter="Concert"  onclick="setFilter('Concert',this)">Concert</button>
+    <button class="pill"        data-filter="Football" onclick="setFilter('Football',this)">Football</button>
+    <button class="pill"        data-filter="Various"  onclick="setFilter('Various',this)">Various</button>
+  </div>
+  <div class="filter-pills" style="margin-left:8px;">
+    <button class="pill" data-status="Apply"   onclick="setStatusFilter('Apply',this)">Apply</button>
+    <button class="pill" data-status="Applied" onclick="setStatusFilter('Applied',this)">Applied</button>
+    <button class="pill" data-status="Ok"      onclick="setStatusFilter('Ok',this)">Ok</button>
+    <button class="pill" data-status="Done"    onclick="setStatusFilter('Done',this)">Done</button>
+  </div>
+</div>
+
+<!-- ── Stats ── -->
+<div class="stats" id="stats"></div>
+
+<!-- ── Table ── -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Day</th>
+        <th>Type</th>
+        <th>Artist / Event</th>
+        <th>Venue</th>
+        <th>Shooting For</th>
+        <th>Management</th>
+        <th>Status</th>
+        <th>Comment</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="icon">🎸</div>
+    <p>No events yet — click <strong>+ Add Event</strong> to get started!</p>
+  </div>
+</div>
+
+<!-- ── Modal ── -->
+<div class="overlay" id="overlay" onclick="closeOnBackdrop(event)">
+  <div class="modal">
+    <h2 id="modalTitle">Add Event</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="f-type">
+          <option value="Concert">Concert</option>
+          <option value="Football">Football</option>
+          <option value="Various">Various</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Artist / Event</label>
+        <input type="text" id="f-artist" placeholder="e.g. Metallica, Champions League Final">
+      </div>
+      <div class="form-group full">
+        <label>Venue</label>
+        <input type="text" id="f-venue" placeholder="e.g. Telenor Arena, Ullevaal Stadion">
+      </div>
+      <div class="form-group">
+        <label>Shooting For</label>
+        <input type="text" id="f-shooting" placeholder="e.g. VG, Aftenposten">
+      </div>
+      <div class="form-group">
+        <label>Management</label>
+        <input type="text" id="f-management" placeholder="e.g. Live Nation, Artist mgmt">
+      </div>
+      <div class="form-group full">
+        <label>Status</label>
+        <select id="f-status">
+          <option value="Apply">Apply</option>
+          <option value="Applied">Applied</option>
+          <option value="Ok">Ok</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Comment</label>
+        <textarea id="f-comment" placeholder="Notes, restrictions, contacts…"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEvent()">Save Event</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  let events = JSON.parse(localStorage.getItem('photoSchedule') || '[]');
+  let editId = null;
+  let filterType = 'all';
+  let filterStatus = null;
+
+  function save() {
+    localStorage.setItem('photoSchedule', JSON.stringify(events));
+  }
+
+  function getDay(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T12:00:00');
+    return DAYS[d.getDay()];
+  }
+
+  function badgeClass(status) {
+    return { Apply:'badge-apply', Applied:'badge-applied', Ok:'badge-ok', Done:'badge-done' }[status] || 'badge-apply';
+  }
+
+  function typeClass(type) {
+    return { Concert:'type-concert', Football:'type-football', Various:'type-various' }[type] || '';
+  }
+
+  function renderTable() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const body = document.getElementById('tableBody');
+    const empty = document.getElementById('emptyState');
+
+    let filtered = events.filter(e => {
+      const matchType   = filterType === 'all' || e.type === filterType;
+      const matchStatus = !filterStatus || e.status === filterStatus;
+      const matchSearch = !q || [e.artist, e.venue, e.shooting, e.management, e.comment]
+        .join(' ').toLowerCase().includes(q);
+      return matchType && matchStatus && matchSearch;
+    });
+
+    // Sort by date ascending
+    filtered.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+    if (filtered.length === 0) {
+      body.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      body.innerHTML = filtered.map(e => `
+        <tr>
+          <td>${e.date || '—'}</td>
+          <td style="color:var(--muted)">${getDay(e.date)}</td>
+          <td><span class="${typeClass(e.type)}">${e.type}</span></td>
+          <td><strong>${esc(e.artist)}</strong></td>
+          <td>${esc(e.venue)}</td>
+          <td>${esc(e.shooting)}</td>
+          <td>${esc(e.management)}</td>
+          <td><span class="badge ${badgeClass(e.status)}">${e.status}</span></td>
+          <td style="max-width:180px;color:var(--muted);font-size:12px">${esc(e.comment)}</td>
+          <td>
+            <div class="td-actions">
+              <button class="btn-edit" onclick="editEvent('${e.id}')">Edit</button>
+              <button class="btn-danger" onclick="deleteEvent('${e.id}')">✕</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    renderStats();
+  }
+
+  function renderStats() {
+    const total    = events.length;
+    const apply    = events.filter(e => e.status === 'Apply').length;
+    const applied  = events.filter(e => e.status === 'Applied').length;
+    const ok       = events.filter(e => e.status === 'Ok').length;
+    const done     = events.filter(e => e.status === 'Done').length;
+    document.getElementById('stats').innerHTML = `
+      <div class="stat">Total: <strong>${total}</strong></div>
+      <div class="stat">Apply: <strong style="color:var(--accent)">${apply}</strong></div>
+      <div class="stat">Applied: <strong style="color:#5dade2">${applied}</strong></div>
+      <div class="stat">Confirmed: <strong style="color:#58d68d">${ok}</strong></div>
+      <div class="stat">Done: <strong>${done}</strong></div>
+    `;
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function openModal(id = null) {
+    editId = id;
+    const e = id ? events.find(x => x.id === id) : null;
+    document.getElementById('modalTitle').textContent = id ? 'Edit Event' : 'Add Event';
+    document.getElementById('f-date').value       = e?.date       || '';
+    document.getElementById('f-type').value       = e?.type       || 'Concert';
+    document.getElementById('f-artist').value     = e?.artist     || '';
+    document.getElementById('f-venue').value      = e?.venue      || '';
+    document.getElementById('f-shooting').value   = e?.shooting   || '';
+    document.getElementById('f-management').value = e?.management || '';
+    document.getElementById('f-status').value     = e?.status     || 'Apply';
+    document.getElementById('f-comment').value    = e?.comment    || '';
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('f-artist').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+    editId = null;
+  }
+
+  function closeOnBackdrop(e) {
+    if (e.target === document.getElementById('overlay')) closeModal();
+  }
+
+  function saveEvent() {
+    const date       = document.getElementById('f-date').value;
+    const type       = document.getElementById('f-type').value;
+    const artist     = document.getElementById('f-artist').value.trim();
+    const venue      = document.getElementById('f-venue').value.trim();
+    const shooting   = document.getElementById('f-shooting').value.trim();
+    const management = document.getElementById('f-management').value.trim();
+    const status     = document.getElementById('f-status').value;
+    const comment    = document.getElementById('f-comment').value.trim();
+
+    if (!artist) { alert('Please enter Artist / Event name.'); return; }
+
+    if (editId) {
+      const idx = events.findIndex(e => e.id === editId);
+      if (idx !== -1) events[idx] = { ...events[idx], date, type, artist, venue, shooting, management, status, comment };
+    } else {
+      events.push({ id: Date.now().toString(), date, type, artist, venue, shooting, management, status, comment });
+    }
+
+    save();
+    renderTable();
+    closeModal();
+  }
+
+  function editEvent(id) { openModal(id); }
+
+  function deleteEvent(id) {
+    if (!confirm('Delete this event?')) return;
+    events = events.filter(e => e.id !== id);
+    save();
+    renderTable();
+  }
+
+  function setFilter(val, btn) {
+    filterType = val;
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+  }
+
+  function setStatusFilter(val, btn) {
+    if (filterStatus === val) {
+      filterStatus = null;
+      btn.classList.remove('active');
+    } else {
+      filterStatus = val;
+      document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    renderTable();
+  }
+
+  function exportCSV() {
+    const headers = ['Date','Day','Type','Artist/Event','Venue','Shooting For','Management','Status','Comment'];
+    const rows = events.map(e => [
+      e.date, getDay(e.date), e.type, e.artist, e.venue, e.shooting, e.management, e.status, e.comment
+    ].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = 'photo-schedule.csv';
+    a.click();
+  }
+
+  // Keyboard shortcut: N = new event
+  document.addEventListener('keydown', e => {
+    if (e.key === 'n' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') openModal();
+    if (e.key === 'Escape') closeModal();
+  });
+
+  renderTable();
+</script>
+</body>
+</html>
