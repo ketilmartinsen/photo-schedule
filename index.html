@@ -686,20 +686,39 @@
 
   // ── Year bar ───────────────────────────────────────────────
   async function buildYearBar() {
-    // Fetch date + type for all records in one query
-    const { data } = await db.from(TABLE).select('date, type, venue, shooting').limit(100000);
+    // Supabase server caps rows at 1000 regardless of .limit(), so we paginate
+    const PAGE  = 1000;
+    let allData = [];
+    let from    = 0;
+    let keepGoing = true;
+
+    while (keepGoing) {
+      const { data, error } = await db.from(TABLE)
+        .select('date, type, venue, shooting')
+        .range(from, from + PAGE - 1);
+      if (error || !data || data.length === 0) {
+        keepGoing = false;
+      } else {
+        allData = allData.concat(data);
+        keepGoing = data.length === PAGE;
+        from += PAGE;
+      }
+    }
+
     allCounts         = {};
-    globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0 };
+    globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0, 'Ikke utfylt': 0 };
     globalVenueCounts = {};
     globalShootingCounts = {};
 
-    (data || []).forEach(r => {
+    allData.forEach(r => {
       if (r.date) {
         const y = parseInt(r.date.substring(0, 4));
         allCounts[y] = (allCounts[y] || 0) + 1;
       }
       if (r.type && globalTypeCounts.hasOwnProperty(r.type)) {
         globalTypeCounts[r.type]++;
+      } else if (!r.type || !r.type.trim()) {
+        globalTypeCounts['Ikke utfylt']++;
       }
       if (r.venue && r.venue.trim()) {
         const v = r.venue.trim();
@@ -1202,7 +1221,6 @@
 
     lines.forEach((line, i) => {
       // Accept both space and semicolon as separator after the date
-      // Venue is optional, separated by |
       const match = line.match(/^(\d{4}-\d{2}-\d{2})[;\s]+(.+?)(?:\s*\|\s*(.+))?$/);
       if (match) {
         const row = { date: match[1], artist: match[2].trim(), venue: (match[3] || '').trim() };
