@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📸 Photo Schedule</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📸</text></svg>">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -17,6 +18,30 @@
       --muted:    #888;
       --danger:   #c0392b;
     }
+    :root.light {
+      --bg:       #f4f4f4;
+      --surface:  #ffffff;
+      --surface2: #efefef;
+      --border:   #ddd;
+      --accent:   #c07010;
+      --accent2:  #a05a08;
+      --text:     #1a1a1a;
+      --muted:    #666;
+      --danger:   #c0392b;
+    }
+    .btn-theme { font-size: 17px; padding: 6px 10px; line-height: 1; }
+    :root.light {
+      --bg:       #f4f4f4;
+      --surface:  #ffffff;
+      --surface2: #efefef;
+      --border:   #ddd;
+      --accent:   #c07010;
+      --accent2:  #a05a08;
+      --text:     #1a1a1a;
+      --muted:    #666;
+      --danger:   #c0392b;
+    }
+    .btn-theme { font-size: 17px; padding: 6px 10px; line-height: 1; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; min-height: 100vh; }
 
@@ -85,9 +110,9 @@
     /* ── Type totals ── */
     .type-totals {
       margin-left: auto; display: flex; align-items: center; gap: 12px;
-      font-size: 12px; color: var(--muted); white-space: nowrap; padding-left: 14px;
-      border-left: 1px solid var(--border);
+      font-size: 12px; color: var(--muted); white-space: nowrap; padding: 0 18px;
     }
+    .toolbar .type-totals { display: none; }
     .type-total-item { display: flex; align-items: center; gap: 5px; }
     .type-total-item strong { color: var(--text); font-size: 13px; }
     .type-total-sep { color: var(--border); }
@@ -105,13 +130,38 @@
 
     /* ── Table ── */
     .table-wrap { overflow-x: auto; padding: 16px 28px; }
-    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1020px; }
     thead tr { background: var(--surface2); text-align: left; }
     th { padding: 10px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent); border-bottom: 2px solid var(--accent); white-space: nowrap; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: #fff; }
+    th.sortable::after { content: ' ⇅'; opacity: 0.35; font-size: 10px; }
+    th.sort-asc::after  { content: ' ↑'; opacity: 1; }
+    th.sort-desc::after { content: ' ↓'; opacity: 1; }
     tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
     tbody tr:hover { background: var(--surface2); }
+    tbody tr.selected { background: #1e1500 !important; }
     td { padding: 8px 12px; vertical-align: middle; }
     .td-actions { display: flex; gap: 6px; white-space: nowrap; }
+    .cb-cell { width: 32px; padding: 8px 6px 8px 14px !important; }
+    input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+
+    /* ── Bulk action bar ── */
+    .bulk-bar {
+      position: fixed; bottom: -70px; left: 50%; transform: translateX(-50%);
+      background: var(--surface2); border: 1px solid var(--accent);
+      border-radius: 12px; padding: 10px 20px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+      transition: bottom 0.25s ease; z-index: 50; white-space: nowrap;
+    }
+    .bulk-bar.visible { bottom: 28px; }
+    .bulk-bar-count { font-size: 13px; font-weight: 700; color: var(--accent); min-width: 70px; }
+    .bulk-bar-label { font-size: 12px; color: var(--muted); margin-right: 4px; }
+    .btn-bulk { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: transparent; cursor: pointer; transition: all 0.15s; }
+    .btn-bulk:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-bulk-cancel { color: var(--muted); }
+    .btn-bulk-cancel:hover { border-color: var(--muted); color: var(--text); }
 
     /* ── Badges ── */
     .badge { display: inline-block; padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
@@ -151,10 +201,124 @@
     textarea { resize: vertical; min-height: 60px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 
+    /* ── Import modal ── */
+    .import-textarea {
+      width: 100%; min-height: 180px; resize: vertical;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; padding: 10px 12px;
+      font-family: 'Consolas', monospace; font-size: 13px; line-height: 1.6;
+    }
+    .import-textarea:focus { outline: none; border-color: var(--accent); }
+    .import-hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+    .import-preview {
+      max-height: 200px; overflow-y: auto; margin-top: 12px;
+      border: 1px solid var(--border); border-radius: 6px; display: none;
+    }
+    .import-preview table { width: 100%; border-collapse: collapse; }
+    .import-preview th { background: var(--surface2); padding: 7px 10px; font-size: 11px; color: var(--accent); text-align: left; }
+    .import-preview td { padding: 5px 10px; font-size: 12px; border-top: 1px solid var(--border); }
+    .import-preview .row-ok  { color: var(--text); }
+    .import-preview .row-err { color: var(--danger); }
+    .import-count { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .import-count strong { color: var(--accent); }
+    .import-progress { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 10px; display: none; }
+    .import-progress-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.2s; width: 0%; }
+
+    /* ── Login screen ── */
+    .login-screen {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: var(--bg);
+      align-items: center; justify-content: center;
+    }
+    .login-screen.visible { display: flex; }
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 40px 36px;
+      width: 360px; max-width: 95vw;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .login-logo { font-size: 26px; font-weight: 700; color: var(--accent); text-align: center; letter-spacing: 1px; }
+    .login-logo span { color: var(--text); font-weight: 300; }
+    .login-subtitle { text-align: center; color: var(--muted); font-size: 13px; margin-top: -12px; }
+    .login-field { display: flex; flex-direction: column; gap: 6px; }
+    .login-field label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+    .login-field input { width: 100%; }
+    .btn-login {
+      width: 100%; padding: 11px; font-size: 14px; font-weight: 700;
+      background: var(--accent); color: #000; border: none; border-radius: 8px;
+      cursor: pointer; transition: background 0.15s; margin-top: 4px;
+    }
+    .btn-login:hover { background: var(--accent2); }
+    .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-error {
+      background: #2a0a0a; border: 1px solid var(--danger);
+      color: #e74c3c; border-radius: 6px; padding: 9px 13px;
+      font-size: 12px; display: none;
+    }
+    .login-error.visible { display: block; }
+
     /* ── Toast ── */
     .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--accent); color: var(--text); padding: 12px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transform: translateY(10px); transition: all 0.25s; z-index: 200; pointer-events: none; }
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast.error { border-left-color: var(--danger); }
+
+    /* ── Quick edit ── */
+    .qe-select, .qe-input {
+      background: var(--surface2); border: 1px solid var(--accent);
+      color: var(--text); border-radius: 4px; padding: 3px 6px;
+      font-size: 12px; font-family: inherit; width: 100%;
+    }
+    td.editable-status, td.editable-comment, td.editable-shooting { cursor: pointer; }
+    td.editable-status:hover, td.editable-comment:hover, td.editable-shooting:hover { background: var(--surface2); }
+
+    /* ── Year summary ── */
+    .year-summary {
+      margin: 0 28px 20px; padding: 18px 22px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; display: none;
+    }
+    .year-summary.open { display: block; }
+    .summary-toggle {
+      display: flex; align-items: center; gap: 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .summary-toggle-item {
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; padding: 8px 22px;
+      font-size: 12px; color: var(--muted);
+      transition: color 0.15s; white-space: nowrap;
+      border-right: 1px solid var(--border);
+    }
+    .summary-toggle-item:hover { color: var(--accent); }
+    .summary-grid { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 14px; }
+    .summary-block h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.6px; margin-bottom: 8px; }
+    .summary-row { display: flex; justify-content: space-between; gap: 20px; font-size: 13px; padding: 2px 0; min-width: 160px; }
+    .summary-row strong { color: var(--text); }
+    .summary-bar-wrap { margin-top: 4px; }
+    .summary-bar { height: 6px; border-radius: 3px; background: var(--accent); margin-bottom: 6px; min-width: 4px; transition: width 0.4s; }
+
+    /* ── Total summary panel ── */
+    .total-summary {
+      margin: 0 28px 20px; padding: 18px 22px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; display: none;
+    }
+    .total-summary.open { display: block; }
+    .chart-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 12px; }
+    .chart-bar-label { width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); text-align: right; flex-shrink: 0; }
+    .chart-bar-track { flex: 1; background: var(--surface2); border-radius: 3px; height: 10px; min-width: 60px; }
+    .chart-bar-fill  { height: 10px; border-radius: 3px; background: var(--accent); transition: width 0.4s; min-width: 4px; }
+    .chart-bar-count { width: 28px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+    /* ── Notif item ── */
+    .notif-item { padding: 9px 16px; border-bottom: 1px solid var(--border); font-size: 12px; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-days { font-weight: 700; color: var(--danger); margin-right: 6px; }
+    .notif-days.soon { color: var(--accent); }
 
     @media (max-width: 600px) {
       header, .year-bar, .toolbar, .table-wrap, .stats { padding-left: 14px; padding-right: 14px; }
@@ -164,6 +328,24 @@
 </head>
 <body>
 
+<!-- ── Login screen ── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">📸 <span>Photo</span>Schedule</div>
+    <div class="login-subtitle">Logg inn for å fortsette</div>
+    <div class="login-field">
+      <label>E-post</label>
+      <input type="text" id="loginEmail" placeholder="din@epost.no" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Passord</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button class="btn-login" id="loginBtn" onclick="login()">Logg inn</button>
+  </div>
+</div>
+
 <!-- ── Header ── -->
 <header>
   <h1>📸 <span>Photo</span>Schedule</h1>
@@ -172,10 +354,23 @@
       <div class="sync-dot" id="syncDot"></div>
       <span id="syncLabel">Kobler til…</span>
     </div>
+    <button class="btn-secondary" onclick="openImport()">⬆ Importer</button>
     <button class="btn-secondary" onclick="exportCSV()">⬇ Eksporter CSV</button>
     <button class="btn-primary" onclick="openModal()" id="addBtn" disabled>＋ Legg til event</button>
+    <div style="position:relative">
+      <button class="btn-secondary" onclick="toggleNotifications()" id="bellBtn" style="display:none" title="Kommende events uten akkreditering">🔔</button>
+      <span id="notifBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;"></span>
+    </div>
+    <button class="btn-theme btn-secondary" onclick="toggleTheme()" id="themeBtn" title="Bytt tema">🌙</button>
+    <button class="btn-secondary" onclick="logout()" id="logoutBtn" style="display:none">⏏ Logg ut</button>
   </div>
 </header>
+
+<!-- ── Notifications dropdown ── -->
+<div id="notifPanel" style="display:none;position:fixed;top:70px;right:20px;z-index:90;background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--danger);border-radius:10px;width:360px;max-height:420px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+  <div style="padding:12px 16px;font-size:12px;font-weight:700;color:var(--danger);border-bottom:1px solid var(--border)">🔔 Kommende events — mangler akkreditering</div>
+  <div id="notifList" style="padding:8px 0"></div>
+</div>
 
 <!-- ── Year bar ── -->
 <div class="year-bar" id="yearBar">
@@ -206,19 +401,35 @@
 <!-- ── Stats ── -->
 <div class="stats" id="stats"></div>
 
+<!-- ── Summary row (year + total toggles + type totals) ── -->
+<div class="summary-toggle" id="summaryToggle" style="display:none">
+  <div class="summary-toggle-item" onclick="toggleSummary()">
+    <span>📊 Årsoppsummering <span id="summaryYear"></span></span>
+    <span id="summaryChevron">▼</span>
+  </div>
+  <div class="summary-toggle-item" onclick="toggleTotalSummary()">
+    <span>🌐 Total Årsoppsummering</span>
+    <span id="totalChevron">▼</span>
+  </div>
+  <div id="typeTotals" class="type-totals"></div>
+</div>
+<div class="year-summary" id="yearSummary"></div>
+<div class="total-summary" id="totalSummary"></div>
+
 <!-- ── Table ── -->
 <div class="table-wrap">
   <table>
     <thead>
       <tr>
-        <th>Dato</th>
+        <th class="cb-cell"><input type="checkbox" id="checkAll" onclick="toggleAll(this)"></th>
+        <th class="sortable" onclick="setSort('date')">Dato</th>
         <th>Dag</th>
-        <th>Type</th>
-        <th>Artist / Event</th>
-        <th>Venue</th>
+        <th class="sortable" onclick="setSort('type')">Type</th>
+        <th class="sortable" onclick="setSort('artist')">Artist / Event</th>
+        <th class="sortable" onclick="setSort('venue')">Venue</th>
         <th>Foto for</th>
         <th>Management</th>
-        <th>Status</th>
+        <th class="sortable" onclick="setSort('status')">Status</th>
         <th>Kommentar</th>
         <th>Handlinger</th>
       </tr>
@@ -270,6 +481,7 @@
           <option value="Festivalguide">Festivalguide</option>
           <option value="Tons of Rock">Tons of Rock</option>
           <option value="Oslo Pride">Oslo Pride</option>
+          <option value="Gonzales">Gonzales</option>
           <option value="Annet">Annet</option>
         </select>
       </div>
@@ -298,6 +510,65 @@
   </div>
 </div>
 
+<!-- ── Import modal ── -->
+<div class="overlay" id="importOverlay" onclick="closeImportOnBackdrop(event)">
+  <div class="modal" style="width:620px">
+    <h2>⬆ Importer events</h2>
+    <div class="form-group full" style="margin-bottom:4px">
+      <label>Lim inn linjer — én event per linje</label>
+      <textarea class="import-textarea" id="importText"
+        placeholder="2026-07-15 Metallica | Telenor Arena&#10;2026-08-02 Champions League | Ullevaal Stadion&#10;2026-08-20 Tons of Rock&#10;2026-09-01 Oslo Konserthus"
+        oninput="parseImport()"></textarea>
+      <div class="import-hint">Format: <code>YYYY-MM-DD Artist / Event | Venue</code> &nbsp;·&nbsp; Dato og navn separert med mellomrom eller semikolon. Venue er valgfritt, legg til <code>|</code> etterfulgt av venue-navn.</div>
+    </div>
+    <div class="form-grid" style="margin-top:12px">
+      <div class="form-group">
+        <label>Standard type</label>
+        <select id="importType">
+          <option value="Konsert">Konsert</option>
+          <option value="Fotball">Fotball</option>
+          <option value="OsloPride">Oslo Pride</option>
+          <option value="Annet">Annet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Standard status</label>
+        <select id="importStatus">
+          <option value="Søke">Søke</option>
+          <option value="Har søkt">Har søkt</option>
+          <option value="Akkred Ok">Akkred Ok</option>
+          <option value="Ferdig">Ferdig</option>
+        </select>
+      </div>
+    </div>
+    <div class="import-count" id="importCount"></div>
+    <div class="import-preview" id="importPreview">
+      <table>
+        <thead><tr><th>#</th><th>Dato</th><th>Artist / Event</th><th>Venue</th></tr></thead>
+        <tbody id="importPreviewBody"></tbody>
+      </table>
+    </div>
+    <div class="import-progress" id="importProgress">
+      <div class="import-progress-bar" id="importProgressBar"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeImport()">Avbryt</button>
+      <button class="btn-primary" id="importBtn" onclick="runImport()" disabled>Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Bulk action bar ── -->
+<div class="bulk-bar" id="bulkBar">
+  <span class="bulk-bar-count" id="bulkCount">0 valgt</span>
+  <span class="bulk-bar-label">Sett status:</span>
+  <button class="btn-bulk" onclick="bulkSetStatus('Søke')">Søke</button>
+  <button class="btn-bulk" onclick="bulkSetStatus('Har søkt')">Har søkt</button>
+  <button class="btn-bulk" onclick="bulkSetStatus('Akkred Ok')">Akkred Ok</button>
+  <button class="btn-bulk" onclick="bulkSetStatus('Ferdig')">Ferdig</button>
+  <button class="btn-bulk btn-bulk-cancel" onclick="clearSelection()">✕ Avbryt</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -307,18 +578,80 @@
   const db    = supabase.createClient(SUPA_URL, SUPA_KEY);
   const TABLE = 'photo_schedule';
 
-  const YEARS = [2014,2015,2016,2017,2019,2020,2021,2022,2023,2024,2025,2026,2027];
+  // ── Auth ───────────────────────────────────────────────────
+  function showLoginScreen(visible) {
+    document.getElementById('loginScreen').classList.toggle('visible', visible);
+    document.getElementById('logoutBtn').style.display = visible ? 'none' : '';
+  }
+
+  async function login() {
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn      = document.getElementById('loginBtn');
+    const errEl    = document.getElementById('loginError');
+
+    if (!email || !password) {
+      errEl.textContent = 'Fyll inn e-post og passord.';
+      errEl.classList.add('visible');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Logger inn…';
+    errEl.classList.remove('visible');
+
+    const { error } = await db.auth.signInWithPassword({ email, password });
+
+    btn.disabled = false;
+    btn.textContent = 'Logg inn';
+
+    if (error) {
+      errEl.textContent = 'Feil e-post eller passord.';
+      errEl.classList.add('visible');
+    }
+    // onAuthStateChange handles the rest
+  }
+
+  async function logout() {
+    await db.auth.signOut();
+    // onAuthStateChange handles showing login screen
+  }
+
+  // Listen for auth state changes (login / logout)
+  db.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      showLoginScreen(false);
+      if (event === 'SIGNED_IN') init();
+    } else {
+      showLoginScreen(true);
+      // Clear app state
+      events = [];
+      document.getElementById('tableBody').innerHTML = '';
+      document.getElementById('stats').innerHTML = '';
+      document.getElementById('yearBar').innerHTML = '<span class="year-label">År:</span>';
+      document.getElementById('typeTotals').innerHTML = '';
+      document.getElementById('addBtn').disabled = true;
+    }
+  });
+
+  const YEARS = [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030];
   const DAYS  = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
 
   let events           = [];
   let allCounts        = {};   // year → count, fetched once
-  let globalTypeCounts = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0 };
+  let globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0 };
+  let globalVenueCounts = {};
+  let globalShootingCounts = {};
+  let totalSummaryOpen  = false;
   let selectedYear     = 2026;
   let editId           = null;
   let filterType       = 'all';
   let filterStatus     = null;
   let globalSearchMode = false;
   let globalResults    = [];
+  let sortCol          = 'date';
+  let sortDir          = 'asc';
+  let selectedIds      = new Set();
 
   // ── Helpers ────────────────────────────────────────────────
   function setSyncState(state, label) {
@@ -354,9 +687,11 @@
   // ── Year bar ───────────────────────────────────────────────
   async function buildYearBar() {
     // Fetch date + type for all records in one query
-    const { data } = await db.from(TABLE).select('date, type');
-    allCounts        = {};
-    globalTypeCounts = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0 };
+    const { data } = await db.from(TABLE).select('date, type, venue, shooting').limit(100000);
+    allCounts         = {};
+    globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0 };
+    globalVenueCounts = {};
+    globalShootingCounts = {};
 
     (data || []).forEach(r => {
       if (r.date) {
@@ -365,6 +700,14 @@
       }
       if (r.type && globalTypeCounts.hasOwnProperty(r.type)) {
         globalTypeCounts[r.type]++;
+      }
+      if (r.venue && r.venue.trim()) {
+        const v = r.venue.trim();
+        globalVenueCounts[v] = (globalVenueCounts[v] || 0) + 1;
+      }
+      if (r.shooting && r.shooting.trim()) {
+        const s = r.shooting.trim();
+        globalShootingCounts[s] = (globalShootingCounts[s] || 0) + 1;
       }
     });
 
@@ -381,6 +724,7 @@
     });
 
     renderTypeTotals();
+    renderTotalSummary();
   }
 
   function renderTypeTotals() {
@@ -455,7 +799,7 @@
     document.querySelectorAll('.year-btn').forEach(b => {
       if (b.textContent.startsWith(year)) b.classList.add('active');
     });
-    // Re-fetch for selected year
+    clearSelection();
     loadEvents();
   }
 
@@ -482,6 +826,9 @@
     setSyncState('online', 'Tilkoblet');
     document.getElementById('addBtn').disabled = false;
 
+    // Refresh global type totals display
+    renderTypeTotals();
+
     // Update year button count
     document.querySelectorAll('.year-btn').forEach(b => {
       const y = parseInt(b.textContent);
@@ -491,15 +838,95 @@
     });
 
     renderTable();
+    buildNotifications(events);
+    renderYearSummary(events);
   }
 
   function showLoadingSkeleton() {
     document.getElementById('tableBody').innerHTML = Array(4).fill('').map(() =>
-      `<tr>${Array(10).fill('').map(() =>
+      `<tr>${Array(11).fill('').map(() =>
         `<td><div class="skeleton" style="width:${55+Math.random()*40}%"></div></td>`
       ).join('')}</tr>`
     ).join('');
     document.getElementById('emptyState').style.display = 'none';
+  }
+
+  // ── Sorting ────────────────────────────────────────────────
+  function setSort(col) {
+    if (sortCol === col) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortCol = col;
+      sortDir = 'asc';
+    }
+    // Update header indicators
+    document.querySelectorAll('th.sortable').forEach(th => {
+      th.classList.remove('sort-asc', 'sort-desc');
+      const colMap = { date: 'Dato', type: 'Type', artist: 'Artist / Event', venue: 'Venue', status: 'Status' };
+      if (th.textContent.trim().startsWith(colMap[col] || col)) {
+        th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      }
+    });
+    renderTable();
+  }
+
+  function applySort(arr) {
+    return [...arr].sort((a, b) => {
+      const va = (a[sortCol] || '').toLowerCase();
+      const vb = (b[sortCol] || '').toLowerCase();
+      return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+  }
+
+  // ── Selection / bulk ───────────────────────────────────────
+  function toggleRow(id, cb) {
+    if (cb.checked) { selectedIds.add(id); }
+    else            { selectedIds.delete(id); }
+    const row = cb.closest('tr');
+    row.classList.toggle('selected', cb.checked);
+    updateBulkBar();
+  }
+
+  function toggleAll(masterCb) {
+    document.querySelectorAll('.cb-row').forEach(cb => {
+      cb.checked = masterCb.checked;
+      const id = cb.dataset.id;
+      if (masterCb.checked) selectedIds.add(id);
+      else                  selectedIds.delete(id);
+      cb.closest('tr').classList.toggle('selected', masterCb.checked);
+    });
+    updateBulkBar();
+  }
+
+  function clearSelection() {
+    selectedIds.clear();
+    document.querySelectorAll('.cb-row').forEach(cb => { cb.checked = false; cb.closest('tr').classList.remove('selected'); });
+    const master = document.getElementById('checkAll');
+    if (master) master.checked = false;
+    updateBulkBar();
+  }
+
+  function updateBulkBar() {
+    const n   = selectedIds.size;
+    const bar = document.getElementById('bulkBar');
+    document.getElementById('bulkCount').textContent = n + ' valgt';
+    bar.classList.toggle('visible', n > 0);
+  }
+
+  async function bulkSetStatus(status) {
+    if (selectedIds.size === 0) return;
+    const ids = [...selectedIds];
+    setSyncState('saving', 'Oppdaterer…');
+    const { error } = await db.from(TABLE).update({ status }).in('id', ids);
+    if (error) {
+      setSyncState('error', 'Feil');
+      showToast('Feil ved oppdatering: ' + error.message, true);
+      return;
+    }
+    setSyncState('online', 'Tilkoblet');
+    showToast(`✓ ${ids.length} events satt til «${status}»`);
+    clearSelection();
+    await loadEvents();
   }
 
   // ── Render table ───────────────────────────────────────────
@@ -521,7 +948,7 @@
       return matchType && matchStatus && matchSearch;
     });
 
-    filtered.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    filtered = applySort(filtered);
 
     if (filtered.length === 0) {
       body.innerHTML = '';
@@ -536,16 +963,34 @@
     } else {
       empty.style.display = 'none';
       body.innerHTML = filtered.map(e => `
-        <tr>
+        <tr class="${selectedIds.has(e.id) ? 'selected' : ''}">
+          <td class="cb-cell"><input type="checkbox" class="cb-row" data-id="${e.id}"
+            ${selectedIds.has(e.id) ? 'checked' : ''}
+            onclick="toggleRow('${e.id}', this)"></td>
           <td>${e.date||'—'}</td>
           <td style="color:var(--muted)">${getDay(e.date)}</td>
           <td><span class="${typeClass(e.type)}">${esc(e.type)}</span></td>
-          <td><strong>${esc(e.artist)}</strong></td>
-          <td>${esc(e.venue)}</td>
-          <td>${esc(e.shooting)}</td>
+          <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="artist"
+            title="Klikk for å redigere"
+            onclick="quickEditText('${e.id}','artist',\`${(e.artist||'').replace(/`/g,"'")}\`)">
+            <strong>${esc(e.artist)||'<span style="opacity:0.3">+</span>'}</strong></td>
+          <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="venue"
+            title="Klikk for å redigere"
+            onclick="quickEditText('${e.id}','venue',\`${(e.venue||'').replace(/`/g,"'")}\`)">
+            ${esc(e.venue)||'<span style="opacity:0.3">+</span>'}</td>
+          <td class="editable-shooting" data-qe-id="${e.id}" data-qe-field="shooting"
+            title="Klikk for å redigere"
+            onclick="quickEditShooting('${e.id}','${esc(e.shooting)}')">
+            ${esc(e.shooting)||'<span style="opacity:0.3">+</span>'}</td>
           <td>${esc(e.management)}</td>
-          <td><span class="badge ${badgeClass(e.status)}">${esc(e.status)}</span></td>
-          <td style="max-width:180px;color:var(--muted);font-size:12px">${esc(e.comment)}</td>
+          <td class="editable-status" data-qe-id="${e.id}" data-qe-field="status"
+            onclick="quickEditStatus('${e.id}','${esc(e.status)}')">
+            <span class="badge ${badgeClass(e.status)}">${esc(e.status)}</span></td>
+          <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="comment"
+            style="max-width:180px;color:var(--muted);font-size:12px"
+            title="Klikk for å redigere"
+            onclick="quickEditComment('${e.id}',\`${(e.comment||'').replace(/`/g,"'")}\`)">
+            ${esc(e.comment)||'<span style="opacity:0.3">+</span>'}</td>
           <td>
             <div class="td-actions">
               <button class="btn-edit"   onclick="openModal('${e.id}')">Rediger</button>
@@ -554,6 +999,9 @@
           </td>
         </tr>
       `).join('');
+      // Sync master checkbox state
+      const master = document.getElementById('checkAll');
+      if (master) master.checked = filtered.length > 0 && filtered.every(e => selectedIds.has(e.id));
     }
     renderStats(filtered);
   }
@@ -722,12 +1170,476 @@
     }
   });
 
+  // ── Import ─────────────────────────────────────────────────
+  let parsedImportRows = [];
+
+  function openImport() {
+    document.getElementById('importText').value = '';
+    document.getElementById('importCount').textContent = '';
+    document.getElementById('importPreview').style.display = 'none';
+    document.getElementById('importBtn').disabled = true;
+    document.getElementById('importProgress').style.display = 'none';
+    document.getElementById('importProgressBar').style.width = '0%';
+    parsedImportRows = [];
+    document.getElementById('importOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('importText').focus(), 100);
+  }
+
+  function closeImport() {
+    document.getElementById('importOverlay').classList.remove('open');
+  }
+
+  function closeImportOnBackdrop(e) {
+    if (e.target === document.getElementById('importOverlay')) closeImport();
+  }
+
+  function parseImport() {
+    const raw   = document.getElementById('importText').value;
+    const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    parsedImportRows = [];
+    const preview = document.getElementById('importPreviewBody');
+    preview.innerHTML = '';
+
+    lines.forEach((line, i) => {
+      // Accept both space and semicolon as separator after the date
+      // Venue is optional, separated by |
+      const match = line.match(/^(\d{4}-\d{2}-\d{2})[;\s]+(.+?)(?:\s*\|\s*(.+))?$/);
+      if (match) {
+        const row = { date: match[1], artist: match[2].trim(), venue: (match[3] || '').trim() };
+        parsedImportRows.push(row);
+        preview.innerHTML += `
+          <tr class="row-ok">
+            <td style="color:var(--muted)">${i + 1}</td>
+            <td>${esc(row.date)}</td>
+            <td>${esc(row.artist)}</td>
+            <td style="color:var(--muted)">${esc(row.venue) || '—'}</td>
+          </tr>`;
+      } else {
+        preview.innerHTML += `
+          <tr class="row-err">
+            <td style="color:var(--muted)">${i + 1}</td>
+            <td colspan="3">⚠ Ugyldig format: ${esc(line)}</td>
+          </tr>`;
+      }
+    });
+
+    const countEl = document.getElementById('importCount');
+    const previewEl = document.getElementById('importPreview');
+
+    if (lines.length === 0) {
+      countEl.innerHTML = '';
+      previewEl.style.display = 'none';
+      document.getElementById('importBtn').disabled = true;
+    } else {
+      const invalid = lines.length - parsedImportRows.length;
+      countEl.innerHTML = `<strong>${parsedImportRows.length}</strong> gyldige linjer klare for import` +
+        (invalid > 0 ? ` · <span style="color:var(--danger)">${invalid} ugyldige ignoreres</span>` : '');
+      previewEl.style.display = 'block';
+      document.getElementById('importBtn').disabled = parsedImportRows.length === 0;
+    }
+  }
+
+  async function runImport() {
+    if (parsedImportRows.length === 0) return;
+    const type   = document.getElementById('importType').value;
+    const status = document.getElementById('importStatus').value;
+    const btn    = document.getElementById('importBtn');
+    const progWrap = document.getElementById('importProgress');
+    const progBar  = document.getElementById('importProgressBar');
+
+    btn.disabled = true;
+    btn.textContent = 'Importerer…';
+    progWrap.style.display = 'block';
+    setSyncState('saving', 'Importerer…');
+
+    const payload = parsedImportRows.map(r => ({
+      date:   r.date,
+      artist: r.artist,
+      type,
+      status,
+      venue:      r.venue || '',
+      shooting:   '',
+      management: '',
+      comment:    '',
+    }));
+
+    // Insert in batches of 50
+    const BATCH = 50;
+    let imported = 0;
+    let failed   = 0;
+
+    for (let i = 0; i < payload.length; i += BATCH) {
+      const batch = payload.slice(i, i + BATCH);
+      const { error } = await db.from(TABLE).insert(batch);
+      if (error) {
+        failed += batch.length;
+      } else {
+        imported += batch.length;
+      }
+      progBar.style.width = Math.round(((i + batch.length) / payload.length) * 100) + '%';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Importer';
+    setSyncState('online', 'Tilkoblet');
+
+    if (failed > 0) {
+      showToast(`Importert ${imported}, ${failed} feilet.`, true);
+    } else {
+      showToast(`✓ ${imported} events importert`);
+    }
+
+    closeImport();
+    await buildYearBar();
+    await loadEvents();
+  }
+
+  // ── Dark / light mode ──────────────────────────────────────
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light');
+    document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  }
+  (function applyStoredTheme() {
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.add('light');
+      document.getElementById('themeBtn').textContent = '☀️';
+    }
+  })();
+
+  // ── Notifications ──────────────────────────────────────────
+  let notifOpen = false;
+
+  function toggleNotifications() {
+    notifOpen = !notifOpen;
+    document.getElementById('notifPanel').style.display = notifOpen ? 'block' : 'none';
+  }
+
+  // Close notif panel when clicking outside
+  document.addEventListener('click', e => {
+    const panel = document.getElementById('notifPanel');
+    const bell  = document.getElementById('bellBtn');
+    if (notifOpen && !panel.contains(e.target) && e.target !== bell) {
+      notifOpen = false;
+      panel.style.display = 'none';
+    }
+  });
+
+  function buildNotifications(evts) {
+    const today   = new Date(); today.setHours(0,0,0,0);
+    const cutoff  = new Date(today); cutoff.setDate(cutoff.getDate() + 60);
+    const pending = evts.filter(e => {
+      if (!e.date) return false;
+      const d = new Date(e.date + 'T12:00:00');
+      return d >= today && d <= cutoff && (e.status === 'Søke' || e.status === 'Har søkt');
+    }).sort((a,b) => a.date.localeCompare(b.date));
+
+    const bell  = document.getElementById('bellBtn');
+    const badge = document.getElementById('notifBadge');
+    const list  = document.getElementById('notifList');
+    bell.style.display = '';
+
+    if (pending.length === 0) {
+      badge.style.display = 'none';
+      list.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:12px;text-align:center">Ingen kommende events mangler akkreditering 👍</div>';
+      return;
+    }
+
+    badge.style.cssText = 'display:flex;position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center;';
+    badge.textContent = pending.length > 9 ? '9+' : pending.length;
+
+    list.innerHTML = pending.map(e => {
+      const days = Math.round((new Date(e.date + 'T12:00:00') - today) / 86400000);
+      const cls  = days <= 7 ? '' : 'soon';
+      const lbl  = days === 0 ? 'I dag' : days === 1 ? 'I morgen' : `${days} dager`;
+      return `<div class="notif-item">
+        <span class="notif-days ${cls}">${lbl}</span>
+        <strong>${esc(e.artist)}</strong>
+        <span style="color:var(--muted)"> — ${e.date}</span>
+        <span class="badge ${badgeClass(e.status)}" style="margin-left:6px;font-size:10px">${esc(e.status)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Year summary ───────────────────────────────────────────
+  let summaryOpen = false;
+
+  function toggleSummary() {
+    summaryOpen = !summaryOpen;
+    document.getElementById('yearSummary').classList.toggle('open', summaryOpen);
+    document.getElementById('summaryChevron').textContent = summaryOpen ? '▲' : '▼';
+  }
+
+  function renderYearSummary(evts) {
+    const toggle = document.getElementById('summaryToggle');
+    const box    = document.getElementById('yearSummary');
+    document.getElementById('summaryYear').textContent = selectedYear;
+    toggle.style.display = evts.length === 0 ? 'none' : 'flex';
+    if (evts.length === 0) { box.classList.remove('open'); summaryOpen = false; return; }
+
+    const types    = ['Konsert','Fotball','OsloPride','Annet'];
+    const statuses = ['Søke','Har søkt','Akkred Ok','Ferdig'];
+    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
+    const total = evts.length;
+    const pct   = n => Math.round((n / total) * 100);
+
+    const typeCounts   = Object.fromEntries(types.map(t   => [t, evts.filter(e => e.type   === t).length]));
+    const statusCounts = Object.fromEntries(statuses.map(s => [s, evts.filter(e => e.status === s).length]));
+
+    const months = Array.from({length:12}, (_,i) => {
+      const m = String(i+1).padStart(2,'0');
+      return evts.filter(e => e.date && e.date.substring(5,7) === m).length;
+    });
+    const maxM = Math.max(...months, 1);
+    const monthNames = ['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Des'];
+
+    const successes = evts.filter(e => e.status === 'Akkred Ok' || e.status === 'Ferdig').length;
+    const rate = total > 0 ? Math.round((successes / total) * 100) : 0;
+
+    box.innerHTML = `
+      <div class="summary-grid">
+        <div class="summary-block">
+          <h4>Per type</h4>
+          ${types.map(t => `
+            <div class="summary-row"><span style="color:${typeColors[t]}">${t}</span><strong>${typeCounts[t]}</strong></div>
+            <div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(typeCounts[t])}%;background:${typeColors[t]}"></div></div>
+          `).join('')}
+        </div>
+        <div class="summary-block">
+          <h4>Per status</h4>
+          ${statuses.map(s => `
+            <div class="summary-row"><span>${s}</span><strong>${statusCounts[s]}</strong></div>
+          `).join('')}
+          <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+            Suksessrate: <strong style="color:#58d68d">${rate}%</strong>
+            <span style="font-size:11px"> (Akkred Ok + Ferdig)</span>
+          </div>
+        </div>
+        <div class="summary-block">
+          <h4>Per måned</h4>
+          <div style="display:flex;align-items:flex-end;gap:5px;height:60px">
+            ${months.map((n,i) => `
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="font-size:9px;color:var(--muted)">${n>0?n:''}</div>
+                <div style="width:16px;background:var(--accent);border-radius:2px 2px 0 0;height:${Math.round((n/maxM)*48)+4}px;opacity:${n>0?1:0.2}"></div>
+                <div style="font-size:9px;color:var(--muted)">${monthNames[i]}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    if (summaryOpen) box.classList.add('open');
+  }
+
+  // ── Total summary ──────────────────────────────────────────
+  function toggleTotalSummary() {
+    totalSummaryOpen = !totalSummaryOpen;
+    document.getElementById('totalSummary').classList.toggle('open', totalSummaryOpen);
+    document.getElementById('totalChevron').textContent = totalSummaryOpen ? '▲' : '▼';
+  }
+
+  function renderTotalSummary() {
+    const box = document.getElementById('totalSummary');
+    if (!box) return;
+
+    const types      = ['Konsert','Fotball','OsloPride','Annet'];
+    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
+    const totalEvents = Object.values(globalTypeCounts).reduce((a,b) => a+b, 0);
+    const pct = (n, tot) => tot > 0 ? Math.round((n / tot) * 100) : 0;
+
+    const venueEntries = Object.entries(globalVenueCounts)
+      .filter(([k]) => k)
+      .sort((a,b) => b[1]-a[1])
+      .slice(0, 15);
+    const maxVenue = venueEntries.length > 0 ? venueEntries[0][1] : 1;
+
+    const shootEntries = Object.entries(globalShootingCounts)
+      .filter(([k]) => k)
+      .sort((a,b) => b[1]-a[1]);
+    const maxShoot = shootEntries.length > 0 ? shootEntries[0][1] : 1;
+
+    box.innerHTML = `
+      <div class="summary-grid">
+        <div class="summary-block">
+          <h4>Per type – alle år (${totalEvents} totalt)</h4>
+          ${types.map(t => `
+            <div class="summary-row">
+              <span style="color:${typeColors[t]}">${t}</span>
+              <strong>${globalTypeCounts[t]}</strong>
+            </div>
+            <div class="summary-bar-wrap">
+              <div class="summary-bar" style="width:${pct(globalTypeCounts[t], totalEvents)}%;background:${typeColors[t]}"></div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="summary-block" style="min-width:260px">
+          <h4>Topp venues</h4>
+          ${venueEntries.length === 0
+            ? '<div style="color:var(--muted);font-size:12px">Ingen data</div>'
+            : venueEntries.map(([v, n]) => `
+              <div class="chart-bar-row">
+                <div class="chart-bar-label">${v}</div>
+                <div class="chart-bar-track">
+                  <div class="chart-bar-fill" style="width:${Math.round((n/maxVenue)*100)}%"></div>
+                </div>
+                <div class="chart-bar-count">${n}</div>
+              </div>`).join('')}
+        </div>
+        <div class="summary-block" style="min-width:220px">
+          <h4>Foto for</h4>
+          ${shootEntries.length === 0
+            ? '<div style="color:var(--muted);font-size:12px">Ingen data</div>'
+            : shootEntries.map(([s, n]) => `
+              <div class="chart-bar-row">
+                <div class="chart-bar-label">${s}</div>
+                <div class="chart-bar-track">
+                  <div class="chart-bar-fill" style="width:${Math.round((n/maxShoot)*100)}%;background:#5dade2"></div>
+                </div>
+                <div class="chart-bar-count">${n}</div>
+              </div>`).join('')}
+        </div>
+      </div>`;
+    if (totalSummaryOpen) box.classList.add('open');
+  }
+
+  // ── Quick edit ─────────────────────────────────────────────
+  async function quickEditStatus(id, currentStatus) {
+    const statuses = ['Søke','Har søkt','Akkred Ok','Ferdig'];
+    const sel = document.createElement('select');
+    sel.className = 'qe-select';
+    statuses.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s; o.textContent = s;
+      if (s === currentStatus) o.selected = true;
+      sel.appendChild(o);
+    });
+
+    const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="status"]`);
+    if (!cell) return;
+    const original = cell.innerHTML;
+    cell.innerHTML = '';
+    cell.appendChild(sel);
+    sel.focus();
+
+    const save = async () => {
+      const newStatus = sel.value;
+      if (newStatus === currentStatus) { cell.innerHTML = original; return; }
+      setSyncState('saving', 'Lagrer…');
+      const { error } = await db.from(TABLE).update({ status: newStatus }).eq('id', id);
+      setSyncState('online', 'Tilkoblet');
+      if (error) { showToast('Feil: ' + error.message, true); cell.innerHTML = original; return; }
+      showToast('✓ Status oppdatert');
+      await loadEvents();
+    };
+    sel.addEventListener('change', save);
+    sel.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== sel) cell.innerHTML = original; }, 150));
+  }
+
+  async function quickEditComment(id, currentComment) {
+    const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="comment"]`);
+    if (!cell) return;
+    const original = cell.innerHTML;
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.className = 'qe-input';
+    inp.value = currentComment || '';
+    cell.innerHTML = ''; cell.appendChild(inp);
+    inp.focus(); inp.select();
+
+    const save = async () => {
+      const newVal = inp.value.trim();
+      if (newVal === (currentComment||'').trim()) { cell.innerHTML = original; return; }
+      setSyncState('saving', 'Lagrer…');
+      const { error } = await db.from(TABLE).update({ comment: newVal }).eq('id', id);
+      setSyncState('online', 'Tilkoblet');
+      if (error) { showToast('Feil: ' + error.message, true); cell.innerHTML = original; return; }
+      showToast('✓ Kommentar oppdatert');
+      await loadEvents();
+    };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { save(); } if (e.key === 'Escape') cell.innerHTML = original; });
+    inp.addEventListener('blur', () => setTimeout(save, 150));
+  }
+
+  // Generic text quick-edit (artist, venue)
+  async function quickEditText(id, field, currentVal) {
+    const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="${field}"]`);
+    if (!cell) return;
+    const original = cell.innerHTML;
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.className = 'qe-input';
+    inp.value = currentVal || '';
+    cell.innerHTML = ''; cell.appendChild(inp);
+    inp.focus(); inp.select();
+
+    const labels = { artist: 'Artist / Event', venue: 'Venue' };
+    const save = async () => {
+      const newVal = inp.value.trim();
+      if (newVal === (currentVal||'').trim()) { cell.innerHTML = original; return; }
+      if (field === 'artist' && !newVal) { showToast('Artist / Event kan ikke være tomt.', true); cell.innerHTML = original; return; }
+      setSyncState('saving', 'Lagrer…');
+      const { error } = await db.from(TABLE).update({ [field]: newVal }).eq('id', id);
+      setSyncState('online', 'Tilkoblet');
+      if (error) { showToast('Feil: ' + error.message, true); cell.innerHTML = original; return; }
+      showToast(`✓ ${labels[field] || field} oppdatert`);
+      await loadEvents();
+    };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { save(); } if (e.key === 'Escape') cell.innerHTML = original; });
+    inp.addEventListener('blur', () => setTimeout(save, 150));
+  }
+
+  // Quick-edit for Foto for (select)
+  async function quickEditShooting(id, currentVal) {
+    const options = ['','Blezt','Puls','MH','NRM','Disharmoni','Musikknyheter','Festivalguide','Tons of Rock','Oslo Pride','Gonzales','Annet'];
+    const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="shooting"]`);
+    if (!cell) return;
+    const original = cell.innerHTML;
+    const sel = document.createElement('select');
+    sel.className = 'qe-select';
+    options.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o; opt.textContent = o || '— Velg —';
+      if (o === currentVal) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    cell.innerHTML = ''; cell.appendChild(sel);
+    sel.focus();
+
+    const save = async () => {
+      const newVal = sel.value;
+      if (newVal === currentVal) { cell.innerHTML = original; return; }
+      setSyncState('saving', 'Lagrer…');
+      const { error } = await db.from(TABLE).update({ shooting: newVal }).eq('id', id);
+      setSyncState('online', 'Tilkoblet');
+      if (error) { showToast('Feil: ' + error.message, true); cell.innerHTML = original; return; }
+      showToast('✓ Foto for oppdatert');
+      await loadEvents();
+    };
+    sel.addEventListener('change', save);
+    sel.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== sel) cell.innerHTML = original; }, 150));
+  }
+
   // ── Init ───────────────────────────────────────────────────
   async function init() {
     await buildYearBar();
     await loadEvents();
   }
-  init();
+
+  // Enter key in login form
+  document.getElementById('loginPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+  document.getElementById('loginEmail').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+  });
+
+  // Check existing session on page load
+  (async () => {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) {
+      showLoginScreen(false);
+      await init();
+    } else {
+      showLoginScreen(true);
+    }
+  })();
 </script>
 </body>
 </html>
