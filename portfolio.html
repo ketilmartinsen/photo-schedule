@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📸 Foto Portfolio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%B8%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg:      #0a0a0a;
+      --surface: #141414;
+      --surface2:#1e1e1e;
+      --border:  #2a2a2a;
+      --gold:    #e8a020;
+      --gold2:   #f5c842;
+      --text:    #efefef;
+      --muted:   #777;
+      --konsert: #e056fd;
+      --fotball: #00cec9;
+      --pride:   #ff6eb4;
+      --annet:   #a0aec0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.35;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+      padding: 80px 8vw;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '📸';
+      position: absolute; right: 6vw; top: 50%; transform: translateY(-50%);
+      font-size: clamp(120px, 20vw, 260px);
+      opacity: 0.07; pointer-events: none; user-select: none;
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(-50%) rotate(-4deg)} 50%{transform:translateY(-54%) rotate(2deg)} }
+
+    .hero-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 20px;
+      opacity: 0; animation: fadeUp 0.6s 0.1s forwards;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 12vw, 160px);
+      line-height: 0.92; letter-spacing: 2px;
+      color: var(--text);
+      opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+    }
+    .hero-title span { color: var(--gold); }
+    .hero-sub {
+      margin-top: 24px; max-width: 520px;
+      font-size: 16px; color: var(--muted); font-weight: 300;
+      opacity: 0; animation: fadeUp 0.7s 0.35s forwards;
+    }
+    .hero-stats {
+      display: flex; gap: 40px; flex-wrap: wrap;
+      margin-top: 52px;
+      opacity: 0; animation: fadeUp 0.7s 0.5s forwards;
+    }
+    .hero-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px; line-height: 1; color: var(--gold);
+    }
+    .hero-stat-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-top: 4px; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Sections ── */
+    section {
+      position: relative; z-index: 1;
+      padding: 80px 8vw;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(32px, 5vw, 56px);
+      letter-spacing: 1px; color: var(--text);
+      margin-bottom: 48px;
+    }
+
+    /* ── Type cards ── */
+    .type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .type-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px 24px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .type-card:hover { transform: translateY(-3px); border-color: var(--gold); }
+    .type-card-icon { font-size: 28px; margin-bottom: 12px; }
+    .type-card-count {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px; line-height: 1; margin-bottom: 4px;
+    }
+    .type-card-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+    .type-card-bar { height: 3px; border-radius: 2px; margin-top: 16px; background: var(--border); }
+    .type-card-bar-fill { height: 3px; border-radius: 2px; transition: width 1s ease; }
+
+    /* ── Timeline ── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .timeline-row {
+      display: flex; align-items: center; gap: 20px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .timeline-year {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; color: var(--gold); width: 60px; flex-shrink: 0;
+    }
+    .timeline-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 28px; overflow: hidden; position: relative; }
+    .timeline-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      display: flex; align-items: center; padding-left: 10px;
+      transition: width 1.2s ease;
+      min-width: 40px;
+    }
+    .timeline-fill-label { font-size: 12px; font-weight: 600; color: #000; white-space: nowrap; }
+    .timeline-count { width: 36px; text-align: right; font-size: 13px; color: var(--muted); flex-shrink: 0; }
+
+    /* ── Bar charts ── */
+    .bar-list { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 14px; }
+    .bar-label { width: 180px; font-size: 13px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
+    .bar-track { flex: 1; background: var(--surface2); border-radius: 3px; height: 10px; }
+    .bar-fill { height: 10px; border-radius: 3px; transition: width 1s ease; }
+    .bar-count { width: 32px; font-size: 12px; color: var(--muted); text-align: right; flex-shrink: 0; }
+
+    /* ── Artists podium ── */
+    .podium-wrap { display: flex; align-items: flex-end; justify-content: center; gap: 16px; margin-bottom: 48px; flex-wrap: wrap; }
+    .podium-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .podium-col {
+      width: 110px; border-radius: 8px 8px 0 0;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding-top: 14px; font-size: 28px;
+    }
+    .podium-col.gold   { background: linear-gradient(180deg,#f9d423 0%,#c07010 100%); }
+    .podium-col.silver { background: linear-gradient(180deg,#c8d6e5 0%,#8395a7 100%); }
+    .podium-col.bronze { background: linear-gradient(180deg,#d4956a 0%,#8e4a2e 100%); }
+    .podium-name { font-size: 13px; font-weight: 600; text-align: center; max-width: 110px; color: var(--text); }
+    .podium-cnt  { font-size: 11px; color: var(--muted); }
+
+    /* ── Two col layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+    @media(max-width:700px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      padding: 40px 8vw; text-align: center;
+      font-size: 12px; color: var(--muted); letter-spacing: 1px;
+    }
+
+    /* ── Loading ── */
+    .loading {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px;
+      transition: opacity 0.5s;
+    }
+    .loading.hidden { opacity: 0; pointer-events: none; }
+    .loading-icon { font-size: 52px; animation: float 2s ease-in-out infinite; }
+    .loading-text { font-size: 13px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ── Scroll animations ── */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.6s, transform 0.6s; }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="loading-icon">📸</div>
+  <div class="loading-text">Laster portfolio…</div>
+</div>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-eyebrow">Fotografi Portfolio</div>
+  <h1 class="hero-title">Bak<br><span>Linsen</span></h1>
+  <p class="hero-sub">Et sammendrag av konsertfotografi, sportsfotografi og live events — fra pit til publikasjon.</p>
+  <div class="hero-stats" id="heroStats"></div>
+</div>
+
+<!-- ── Timeline ── -->
+<section>
+  <div class="section-label reveal">År for år</div>
+  <div class="section-title reveal">Historikk</div>
+  <div class="timeline reveal" id="timeline"></div>
+</section>
+
+<!-- ── Type breakdown ── -->
+<section>
+  <div class="section-label reveal">Hva jeg fotograferer</div>
+  <div class="section-title reveal">Sjangere</div>
+  <div class="type-grid reveal" id="typeGrid"></div>
+</section>
+
+<!-- ── Artists + Venues ── -->
+<section>
+  <div class="section-label reveal">Mest fotografert</div>
+  <div class="section-title reveal">Artister &amp; Venues</div>
+  <div id="podiumWrap" class="podium-wrap reveal"></div>
+  <div class="two-col reveal">
+    <div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Topp artister</div>
+      <div class="bar-list" id="artistBars"></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Topp venues</div>
+      <div class="bar-list" id="venueBars"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Shooting breakdown ── -->
+<section>
+  <div class="section-label reveal">Publisert i</div>
+  <div class="section-title reveal">Foto for</div>
+  <div class="bar-list reveal" id="shootBars" style="max-width:600px"></div>
+</section>
+
+<footer>📸 Fotografi Portfolio · Generert fra live data</footer>
+
+<script>
+  const SUPA_URL = 'https://hgsvsisnauzrlwqaicim.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnc3ZzaXNuYXV6cmx3cWFpY2ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3Mjk1MjIsImV4cCI6MjA5MTMwNTUyMn0.FrvfXV3b7zC7ct8S9Y4rbMPYWkDEnG3bZW3Kt0Rn-zw';
+  const db    = supabase.createClient(SUPA_URL, SUPA_KEY);
+  const TABLE = 'photo_schedule';
+
+  const TYPE_COLORS = { Konsert:'var(--konsert)', Fotball:'var(--fotball)', OsloPride:'var(--pride)', Annet:'var(--annet)' };
+  const TYPE_ICONS  = { Konsert:'🎸', Fotball:'⚽', OsloPride:'🌈', Annet:'📷' };
+
+  async function loadAll() {
+    const PAGE = 1000; let all = []; let from = 0; let go = true;
+    while (go) {
+      const { data, error } = await db.from(TABLE)
+        .select('date,type,artist,venue,shooting,status')
+        .range(from, from + PAGE - 1);
+      if (error || !data || !data.length) { go = false; }
+      else { all = all.concat(data); go = data.length === PAGE; from += PAGE; }
+    }
+    return all;
+  }
+
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  async function init() {
+    const todayStr = new Date().toISOString().substring(0,10);
+    const all  = await loadAll();
+    const past = all.filter(r => r.date && r.date < todayStr);
+
+    // ── Hero stats ──
+    const years = new Set(past.filter(r=>r.date).map(r=>r.date.substring(0,4)));
+    const venues = new Set(past.filter(r=>r.venue&&r.venue.trim()).map(r=>r.venue.trim()));
+    document.getElementById('heroStats').innerHTML = [
+      [past.length,  'Events fotografert'],
+      [years.size,   'Aktive år'],
+      [venues.size,  'Unike venues'],
+    ].map(([n,l]) => `
+      <div>
+        <div class="hero-stat-num">${n}</div>
+        <div class="hero-stat-label">${l}</div>
+      </div>`).join('');
+
+    // ── Timeline ──
+    const yearCounts = {};
+    past.forEach(r => { if(r.date){ const y=r.date.substring(0,4); yearCounts[y]=(yearCounts[y]||0)+1; } });
+    const sortedYears = Object.keys(yearCounts).sort();
+    const maxY = Math.max(...Object.values(yearCounts), 1);
+    document.getElementById('timeline').innerHTML = sortedYears.map(y => `
+      <div class="timeline-row">
+        <div class="timeline-year">${y}</div>
+        <div class="timeline-track">
+          <div class="timeline-fill" style="width:${Math.round((yearCounts[y]/maxY)*100)}%">
+            <span class="timeline-fill-label">${yearCounts[y]} events</span>
+          </div>
+        </div>
+      </div>`).join('');
+
+    // ── Type cards ──
+    const typeCounts = { Konsert:0, Fotball:0, OsloPride:0, Annet:0 };
+    past.forEach(r => { if(typeCounts.hasOwnProperty(r.type)) typeCounts[r.type]++; });
+    const maxT = Math.max(...Object.values(typeCounts), 1);
+    document.getElementById('typeGrid').innerHTML = Object.entries(typeCounts).map(([t,n]) => `
+      <div class="type-card">
+        <div class="type-card-icon">${TYPE_ICONS[t]}</div>
+        <div class="type-card-count" style="color:${TYPE_COLORS[t]}">${n}</div>
+        <div class="type-card-label">${t}</div>
+        <div class="type-card-bar">
+          <div class="type-card-bar-fill" style="width:${Math.round((n/maxT)*100)}%;background:${TYPE_COLORS[t]}"></div>
+        </div>
+      </div>`).join('');
+
+    // ── Artists ──
+    const artistCounts = {};
+    past.forEach(r => { if(r.artist&&r.artist.trim()){ const a=r.artist.trim(); artistCounts[a]=(artistCounts[a]||0)+1; } });
+    const topArtists = Object.entries(artistCounts).sort((a,b)=>b[1]-a[1]);
+    const top3 = topArtists.slice(0,3);
+    const rest = topArtists.slice(3,20);
+    const maxA = topArtists.length ? topArtists[0][1] : 1;
+
+    const podiumOrder = [1,0,2];
+    const medals = ['🥇','🥈','🥉'];
+    const pcls   = ['gold','silver','bronze'];
+    const pheights = [130,160,100];
+    document.getElementById('podiumWrap').innerHTML = podiumOrder.filter(i=>top3[i]).map(i=>{
+      const [name,cnt] = top3[i];
+      return `<div class="podium-item">
+        <div style="font-size:11px;color:var(--muted)">${cnt} gang${cnt>1?'er':''}</div>
+        <div class="podium-col ${pcls[i]}" style="height:${pheights[i]}px">${medals[i]}</div>
+        <div class="podium-name">${esc(name)}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('artistBars').innerHTML = rest.map(([name,cnt],i) => `
+      <div class="bar-row">
+        <div class="bar-label" title="${esc(name)}">${i+4}. ${esc(name)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round((cnt/maxA)*100)}%;background:var(--gold)"></div></div>
+        <div class="bar-count">${cnt}</div>
+      </div>`).join('');
+
+    // ── Venues ──
+    const venueCounts = {};
+    past.forEach(r => { if(r.venue&&r.venue.trim()){ const v=r.venue.trim(); venueCounts[v]=(venueCounts[v]||0)+1; } });
+    const topVenues = Object.entries(venueCounts).sort((a,b)=>b[1]-a[1]).slice(0,15);
+    const maxV = topVenues.length ? topVenues[0][1] : 1;
+    document.getElementById('venueBars').innerHTML = topVenues.map(([v,n]) => `
+      <div class="bar-row">
+        <div class="bar-label" title="${esc(v)}">${esc(v)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round((n/maxV)*100)}%;background:var(--fotball)"></div></div>
+        <div class="bar-count">${n}</div>
+      </div>`).join('');
+
+    // ── Shooting ──
+    const shootCounts = {};
+    past.forEach(r => { if(r.shooting&&r.shooting.trim()){ const s=r.shooting.trim(); shootCounts[s]=(shootCounts[s]||0)+1; } });
+    const topShoot = Object.entries(shootCounts).sort((a,b)=>b[1]-a[1]);
+    const maxS = topShoot.length ? topShoot[0][1] : 1;
+    document.getElementById('shootBars').innerHTML = topShoot.map(([s,n]) => `
+      <div class="bar-row">
+        <div class="bar-label">${esc(s)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round((n/maxS)*100)}%;background:var(--pride)"></div></div>
+        <div class="bar-count">${n}</div>
+      </div>`).join('');
+
+    // ── Hide loader ──
+    document.getElementById('loading').classList.add('hidden');
+
+    // ── Scroll reveal ──
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  }
+
+  init();
+</script>
+</body>
+</html>
