@@ -143,25 +143,66 @@
     tbody tr.selected { background: #1e1500 !important; }
     td { padding: 8px 12px; vertical-align: middle; }
     .td-actions { display: flex; gap: 6px; white-space: nowrap; }
-    .cb-cell { width: 32px; padding: 8px 6px 8px 14px !important; }
-    input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
-
-    /* ── Bulk action bar ── */
-    .bulk-bar {
-      position: fixed; bottom: -70px; left: 50%; transform: translateX(-50%);
-      background: var(--surface2); border: 1px solid var(--accent);
-      border-radius: 12px; padding: 10px 20px;
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.6);
-      transition: bottom 0.25s ease; z-index: 50; white-space: nowrap;
+    /* ── Nav tabs ── */
+    .nav-tabs {
+      display: flex; gap: 0; border-bottom: 2px solid var(--border);
+      background: var(--surface); padding: 0 28px;
     }
-    .bulk-bar.visible { bottom: 28px; }
-    .bulk-bar-count { font-size: 13px; font-weight: 700; color: var(--accent); min-width: 70px; }
-    .bulk-bar-label { font-size: 12px; color: var(--muted); margin-right: 4px; }
-    .btn-bulk { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: transparent; cursor: pointer; transition: all 0.15s; }
-    .btn-bulk:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-bulk-cancel { color: var(--muted); }
-    .btn-bulk-cancel:hover { border-color: var(--muted); color: var(--text); }
+    .nav-tab {
+      padding: 10px 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; border: none; background: transparent;
+      color: var(--muted); border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: all 0.15s; letter-spacing: 0.3px;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Page panels ── */
+    .page-panel { display: none; }
+    .page-panel.active { display: block; }
+
+    /* ── Calendar ── */
+    .calendar-wrap { padding: 20px 28px; }
+    .calendar-nav { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .cal-month-label { font-size: 18px; font-weight: 700; color: var(--accent); min-width: 160px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-header { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); padding: 6px 0; text-transform: uppercase; }
+    .cal-day {
+      min-height: 80px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 5px 6px; font-size: 11px; cursor: default;
+    }
+    .cal-day.other-month { opacity: 0.3; }
+    .cal-day.today { border-color: var(--accent); }
+    .cal-day-num { font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--muted); }
+    .cal-day.today .cal-day-num { color: var(--accent); }
+    .cal-event {
+      background: #3d2200; border-left: 2px solid var(--accent);
+      border-radius: 3px; padding: 2px 4px; margin-bottom: 2px;
+      font-size: 10px; line-height: 1.3; cursor: pointer; color: var(--text);
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    }
+    .cal-event.status-ok    { background: #0a2e1a; border-color: #27ae60; }
+    .cal-event.status-done  { background: #222; border-color: #555; color: #888; }
+    .cal-event.status-applied { background: #0a2540; border-color: #2980b9; }
+
+    /* ── Artist stats page ── */
+    .artist-stats-wrap { padding: 20px 28px; }
+    .artist-stats-wrap h3 { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 18px; }
+    .artist-podium { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 32px; justify-content: center; }
+    .podium-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .podium-bar { width: 90px; border-radius: 6px 6px 0 0; background: var(--accent); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font-size: 22px; min-height: 40px; transition: height 0.5s; }
+    .podium-bar.gold   { background: linear-gradient(180deg,#f9d423,#e8a020); }
+    .podium-bar.silver { background: linear-gradient(180deg,#bdc3c7,#95a5a6); }
+    .podium-bar.bronze { background: linear-gradient(180deg,#cd7f32,#a0522d); }
+    .podium-label { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; max-width: 100px; }
+    .podium-count { font-size: 11px; color: var(--muted); }
+    .artist-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .artist-rank { width: 24px; font-size: 12px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .artist-name { width: 200px; font-size: 13px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
+    .artist-track { flex: 1; background: var(--surface2); border-radius: 3px; height: 12px; }
+    .artist-fill  { height: 12px; border-radius: 3px; background: var(--accent); transition: width 0.5s; }
+    .artist-count { width: 32px; font-size: 12px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .artist-type-chip { font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-left: 6px; }
 
     /* ── Badges ── */
     .badge { display: inline-block; padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
@@ -372,6 +413,16 @@
   <div id="notifList" style="padding:8px 0"></div>
 </div>
 
+<!-- ── Nav tabs ── -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('schedule')">📋 Timeplan</button>
+  <button class="nav-tab" onclick="switchTab('calendar')">📅 Kalender</button>
+  <button class="nav-tab" onclick="switchTab('artists')">🏆 Artister</button>
+</div>
+
+<!-- ── Schedule page ── -->
+<div class="page-panel active" id="page-schedule">
+
 <!-- ── Year bar ── -->
 <div class="year-bar" id="yearBar">
   <span class="year-label">År:</span>
@@ -421,7 +472,6 @@
   <table>
     <thead>
       <tr>
-        <th class="cb-cell"><input type="checkbox" id="checkAll" onclick="toggleAll(this)"></th>
         <th class="sortable" onclick="setSort('date')">Dato</th>
         <th>Dag</th>
         <th class="sortable" onclick="setSort('type')">Type</th>
@@ -442,7 +492,37 @@
   </div>
 </div>
 
-<!-- ── Modal ── -->
+</div><!-- end page-schedule -->
+
+<!-- ── Calendar page ── -->
+<div class="page-panel" id="page-calendar">
+  <div class="calendar-wrap">
+    <div class="calendar-nav">
+      <button class="btn-secondary" onclick="calPrev()">‹ Forrige</button>
+      <span class="cal-month-label" id="calMonthLabel"></span>
+      <button class="btn-secondary" onclick="calNext()">Neste ›</button>
+      <button class="btn-secondary" onclick="calToday()" style="margin-left:8px">I dag</button>
+    </div>
+    <div class="cal-grid" id="calGrid">
+      <div class="cal-header">Man</div>
+      <div class="cal-header">Tir</div>
+      <div class="cal-header">Ons</div>
+      <div class="cal-header">Tor</div>
+      <div class="cal-header">Fre</div>
+      <div class="cal-header">Lør</div>
+      <div class="cal-header">Søn</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Artists page ── -->
+<div class="page-panel" id="page-artists">
+  <div class="artist-stats-wrap">
+    <h3>🏆 Mest fotograferte artister / events</h3>
+    <div id="artistPodium" class="artist-podium"></div>
+    <div id="artistList"></div>
+  </div>
+</div>
 <div class="overlay" id="overlay" onclick="closeOnBackdrop(event)">
   <div class="modal">
     <h2 id="modalTitle">Legg til event</h2>
@@ -558,16 +638,7 @@
   </div>
 </div>
 
-<!-- ── Bulk action bar ── -->
-<div class="bulk-bar" id="bulkBar">
-  <span class="bulk-bar-count" id="bulkCount">0 valgt</span>
-  <span class="bulk-bar-label">Sett status:</span>
-  <button class="btn-bulk" onclick="bulkSetStatus('Søke')">Søke</button>
-  <button class="btn-bulk" onclick="bulkSetStatus('Har søkt')">Har søkt</button>
-  <button class="btn-bulk" onclick="bulkSetStatus('Akkred Ok')">Akkred Ok</button>
-  <button class="btn-bulk" onclick="bulkSetStatus('Ferdig')">Ferdig</button>
-  <button class="btn-bulk btn-bulk-cancel" onclick="clearSelection()">✕ Avbryt</button>
-</div>
+
 
 <div class="toast" id="toast"></div>
 
@@ -652,6 +723,10 @@
   let sortCol          = 'date';
   let sortDir          = 'asc';
   let selectedIds      = new Set();
+  let calYear          = new Date().getFullYear();
+  let calMonth         = new Date().getMonth();
+  let calAllEvents     = []; // all events across years for calendar
+  let activeTab        = 'schedule';
 
   // ── Helpers ────────────────────────────────────────────────
   function setSyncState(state, label) {
@@ -710,11 +785,15 @@
     globalVenueCounts = {};
     globalShootingCounts = {};
 
+    const todayStr = new Date().toISOString().substring(0, 10);
+
     allData.forEach(r => {
       if (r.date) {
         const y = parseInt(r.date.substring(0, 4));
         allCounts[y] = (allCounts[y] || 0) + 1;
       }
+      // Global summary counts: past events only (strictly before today)
+      if (!r.date || r.date >= todayStr) return;
       if (r.type && globalTypeCounts.hasOwnProperty(r.type)) {
         globalTypeCounts[r.type]++;
       } else if (!r.type || !r.type.trim()) {
@@ -897,56 +976,25 @@
     });
   }
 
-  // ── Selection / bulk ───────────────────────────────────────
-  function toggleRow(id, cb) {
-    if (cb.checked) { selectedIds.add(id); }
-    else            { selectedIds.delete(id); }
-    const row = cb.closest('tr');
-    row.classList.toggle('selected', cb.checked);
-    updateBulkBar();
-  }
-
-  function toggleAll(masterCb) {
-    document.querySelectorAll('.cb-row').forEach(cb => {
-      cb.checked = masterCb.checked;
-      const id = cb.dataset.id;
-      if (masterCb.checked) selectedIds.add(id);
-      else                  selectedIds.delete(id);
-      cb.closest('tr').classList.toggle('selected', masterCb.checked);
+  // ── Tab switching ──────────────────────────────────────────
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.nav-tab').forEach((t,i) => {
+      const tabs = ['schedule','calendar','artists'];
+      t.classList.toggle('active', tabs[i] === tab);
     });
-    updateBulkBar();
+    document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + tab).classList.add('active');
+    if (tab === 'calendar') { loadCalendarEvents(); }
+    if (tab === 'artists')  { renderArtistStats(); }
   }
 
-  function clearSelection() {
-    selectedIds.clear();
-    document.querySelectorAll('.cb-row').forEach(cb => { cb.checked = false; cb.closest('tr').classList.remove('selected'); });
-    const master = document.getElementById('checkAll');
-    if (master) master.checked = false;
-    updateBulkBar();
-  }
-
-  function updateBulkBar() {
-    const n   = selectedIds.size;
-    const bar = document.getElementById('bulkBar');
-    document.getElementById('bulkCount').textContent = n + ' valgt';
-    bar.classList.toggle('visible', n > 0);
-  }
-
-  async function bulkSetStatus(status) {
-    if (selectedIds.size === 0) return;
-    const ids = [...selectedIds];
-    setSyncState('saving', 'Oppdaterer…');
-    const { error } = await db.from(TABLE).update({ status }).in('id', ids);
-    if (error) {
-      setSyncState('error', 'Feil');
-      showToast('Feil ved oppdatering: ' + error.message, true);
-      return;
-    }
-    setSyncState('online', 'Tilkoblet');
-    showToast(`✓ ${ids.length} events satt til «${status}»`);
-    clearSelection();
-    await loadEvents();
-  }
+  // ── Selection stubs (checkboxes removed) ──────────────────
+  function toggleRow() {}
+  function toggleAll() {}
+  function clearSelection() {}
+  function updateBulkBar() {}
+  function bulkSetStatus() {}
 
   // ── Render table ───────────────────────────────────────────
   function renderTable() {
@@ -982,10 +1030,7 @@
     } else {
       empty.style.display = 'none';
       body.innerHTML = filtered.map(e => `
-        <tr class="${selectedIds.has(e.id) ? 'selected' : ''}">
-          <td class="cb-cell"><input type="checkbox" class="cb-row" data-id="${e.id}"
-            ${selectedIds.has(e.id) ? 'checked' : ''}
-            onclick="toggleRow('${e.id}', this)"></td>
+        <tr>
           <td>${e.date||'—'}</td>
           <td style="color:var(--muted)">${getDay(e.date)}</td>
           <td><span class="${typeClass(e.type)}">${esc(e.type)}</span></td>
@@ -1013,14 +1058,12 @@
           <td>
             <div class="td-actions">
               <button class="btn-edit"   onclick="openModal('${e.id}')">Rediger</button>
+              <button class="btn-secondary" style="padding:4px 10px;font-size:12px" onclick="duplicateEvent('${e.id}')" title="Dupliser event">⧉</button>
               <button class="btn-danger" onclick="deleteEvent('${e.id}')">✕</button>
             </div>
           </td>
         </tr>
       `).join('');
-      // Sync master checkbox state
-      const master = document.getElementById('checkAll');
-      if (master) master.checked = filtered.length > 0 && filtered.every(e => selectedIds.has(e.id));
     }
     renderStats(filtered);
   }
@@ -1478,7 +1521,7 @@
     box.innerHTML = `
       <div class="summary-grid">
         <div class="summary-block">
-          <h4>Per type – alle år (${totalEvents} totalt)</h4>
+          <h4>Per type – alle år, tidligere events (${totalEvents} totalt)</h4>
           ${types.map(t => `
             <div class="summary-row">
               <span style="color:${typeColors[t]}">${t}</span>
@@ -1632,6 +1675,162 @@
     };
     sel.addEventListener('change', save);
     sel.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== sel) cell.innerHTML = original; }, 150));
+  }
+
+  // ── Duplicate event ────────────────────────────────────────
+  async function duplicateEvent(id) {
+    const e = events.find(x => x.id === id);
+    if (!e) return;
+    const { id: _id, created_at, ...payload } = e;
+    setSyncState('saving', 'Dupliserer…');
+    const { error } = await db.from(TABLE).insert(payload);
+    if (error) {
+      setSyncState('error', 'Feil');
+      showToast('Feil ved duplisering: ' + error.message, true);
+      return;
+    }
+    setSyncState('online', 'Tilkoblet');
+    showToast('✓ Event duplisert');
+    await buildYearBar();
+    await loadEvents();
+  }
+
+  // ── Calendar ───────────────────────────────────────────────
+  async function loadCalendarEvents() {
+    setSyncState('saving', 'Laster kalender…');
+    const from = `${calYear}-01-01`;
+    const to   = `${calYear}-12-31`;
+    const { data, error } = await db.from(TABLE).select('*')
+      .gte('date', from).lte('date', to)
+      .order('date', { ascending: true });
+    setSyncState('online', 'Tilkoblet');
+    if (error) { showToast('Kalender feil: ' + error.message, true); return; }
+    calAllEvents = data || [];
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const monthNames = ['Januar','Februar','Mars','April','Mai','Juni','Juli','August','September','Oktober','November','Desember'];
+    document.getElementById('calMonthLabel').textContent = `${monthNames[calMonth]} ${calYear}`;
+
+    const grid = document.getElementById('calGrid');
+    // Keep day-of-week headers (first 7 children)
+    const headers = Array.from(grid.children).slice(0, 7);
+    grid.innerHTML = '';
+    headers.forEach(h => grid.appendChild(h));
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const firstDay = new Date(calYear, calMonth, 1);
+    const lastDay  = new Date(calYear, calMonth + 1, 0);
+
+    // Monday-based: Mon=0 … Sun=6
+    let startDow = firstDay.getDay() - 1; if (startDow < 0) startDow = 6;
+    const totalCells = Math.ceil((startDow + lastDay.getDate()) / 7) * 7;
+
+    const eventsThisMonth = calAllEvents.filter(e => {
+      if (!e.date) return false;
+      const [y, m] = e.date.split('-').map(Number);
+      return y === calYear && m === calMonth + 1;
+    });
+
+    for (let i = 0; i < totalCells; i++) {
+      const dayOffset = i - startDow + 1;
+      const d = new Date(calYear, calMonth, dayOffset);
+      const cell = document.createElement('div');
+      cell.className = 'cal-day' +
+        (dayOffset < 1 || dayOffset > lastDay.getDate() ? ' other-month' : '') +
+        (d.getTime() === today.getTime() ? ' today' : '');
+      const dayNum = document.createElement('div');
+      dayNum.className = 'cal-day-num';
+      dayNum.textContent = d.getDate();
+      cell.appendChild(dayNum);
+
+      const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      eventsThisMonth.filter(e => e.date === dateStr).forEach(e => {
+        const ev = document.createElement('div');
+        const sc = { 'Akkred Ok':'status-ok','Ferdig':'status-done','Har søkt':'status-applied' }[e.status] || '';
+        ev.className = `cal-event ${sc}`;
+        ev.textContent = e.artist || '—';
+        ev.title = `${e.artist} @ ${e.venue||'?'} [${e.status}]`;
+        ev.onclick = () => { switchTab('schedule'); selectYear(calYear); setTimeout(() => openModal(e.id), 400); };
+        cell.appendChild(ev);
+      });
+      grid.appendChild(cell);
+    }
+  }
+
+  function calPrev() {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    if (activeTab === 'calendar') loadCalendarEvents();
+  }
+  function calNext() {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (activeTab === 'calendar') loadCalendarEvents();
+  }
+  function calToday() {
+    const now = new Date();
+    calYear = now.getFullYear(); calMonth = now.getMonth();
+    if (activeTab === 'calendar') loadCalendarEvents();
+  }
+
+  // ── Artist stats ───────────────────────────────────────────
+  async function renderArtistStats() {
+    setSyncState('saving', 'Laster artistdata…');
+    // Paginate all events
+    const PAGE = 1000; let allData = []; let from = 0; let keepGoing = true;
+    while (keepGoing) {
+      const { data, error } = await db.from(TABLE).select('artist,type').range(from, from + PAGE - 1);
+      if (error || !data || data.length === 0) { keepGoing = false; }
+      else { allData = allData.concat(data); keepGoing = data.length === PAGE; from += PAGE; }
+    }
+    setSyncState('online', 'Tilkoblet');
+
+    const counts = {};
+    const typeFor = {};
+    allData.forEach(e => {
+      if (!e.artist || !e.artist.trim()) return;
+      const a = e.artist.trim();
+      counts[a] = (counts[a] || 0) + 1;
+      if (!typeFor[a]) typeFor[a] = e.type;
+    });
+
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+    const top3   = sorted.slice(0, 3);
+    const rest   = sorted.slice(3, 50);
+    const maxCount = sorted.length > 0 ? sorted[0][1] : 1;
+
+    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
+    const medals = ['🥇','🥈','🥉'];
+    const barClasses = ['gold','silver','bronze'];
+    const heights = [120, 90, 70];
+
+    const podiumOrder = [1, 0, 2]; // silver, gold, bronze layout
+    document.getElementById('artistPodium').innerHTML = top3.length === 0
+      ? '<div style="color:var(--muted)">Ingen data ennå.</div>'
+      : podiumOrder.filter(i => top3[i]).map(i => {
+          const [name, count] = top3[i];
+          return `
+            <div class="podium-item">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:2px">${count} gang${count>1?'er':''}</div>
+              <div class="podium-bar ${barClasses[i]}" style="height:${heights[i]}px">${medals[i]}</div>
+              <div class="podium-label" style="color:${typeColors[typeFor[name]]||'var(--text)'}">${esc(name)}</div>
+            </div>`;
+        }).join('');
+
+    document.getElementById('artistList').innerHTML = rest.length === 0 ? '' : `
+      <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:18px">
+        ${rest.map(([name, count], idx) => `
+          <div class="artist-bar-row">
+            <div class="artist-rank">${idx + 4}</div>
+            <div class="artist-name" style="color:${typeColors[typeFor[name]]||'var(--text)'}" title="${esc(name)}">${esc(name)}</div>
+            <div class="artist-track">
+              <div class="artist-fill" style="width:${Math.round((count/maxCount)*100)}%"></div>
+            </div>
+            <div class="artist-count">${count}</div>
+          </div>`).join('')}
+      </div>`;
   }
 
   // ── Init ───────────────────────────────────────────────────
