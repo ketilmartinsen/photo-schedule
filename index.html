@@ -562,6 +562,7 @@
           <option value="Tons of Rock">Tons of Rock</option>
           <option value="Oslo Pride">Oslo Pride</option>
           <option value="Gonzales">Gonzales</option>
+          <option value="Rockman">Rockman</option>
           <option value="Annet">Annet</option>
         </select>
       </div>
@@ -1648,7 +1649,7 @@
 
   // Quick-edit for Foto for (select)
   async function quickEditShooting(id, currentVal) {
-    const options = ['','Blezt','Puls','MH','NRM','Disharmoni','Musikknyheter','Festivalguide','Tons of Rock','Oslo Pride','Gonzales','Annet'];
+    const options = ['','Blezt','Puls','MH','NRM','Disharmoni','Musikknyheter','Festivalguide','Tons of Rock','Oslo Pride','Gonzales','Rockman','Annet'];
     const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="shooting"]`);
     if (!cell) return;
     const original = cell.innerHTML;
