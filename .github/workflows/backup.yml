@@ -15,6 +15,12 @@ on:
     - cron: '0 4 * * 1'   # Every Monday at 04:00 UTC
   workflow_dispatch:        # Also allows manual trigger from GitHub Actions tab
 
+permissions:
+  contents: write           # Required to commit and push the CSV back to the repo
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   backup:
     runs-on: ubuntu-latest
@@ -120,5 +126,5 @@ jobs:
           else
             ROWS=$(grep -c "^[^#]" backups/photo-schedule-backup.csv || echo "?")
             git commit -m "backup: $(date -u +%Y-%m-%d) — ${ROWS} rows"
-            git push
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref_name }}
           fi
