@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+a<!DOCTYPE html>
 <html lang="no">
 <head>
   <meta charset="UTF-8" />
@@ -554,8 +554,8 @@
           <option value="">— Velg —</option>
           <option value="Blezt">Blezt</option>
           <option value="Puls">Puls</option>
-          <option value="MH">MH</option>
-          <option value="NRM">NRM</option>
+          <option value="MetalHammer">MetalHammer</option>
+          <option value="NorwayRockMagazine">NorwayRockMagazine</option>
           <option value="Disharmoni">Disharmoni</option>
           <option value="Musikknyheter">Musikknyheter</option>
           <option value="Festivalguide">Festivalguide</option>
@@ -1649,7 +1649,7 @@
 
   // Quick-edit for Foto for (select)
   async function quickEditShooting(id, currentVal) {
-    const options = ['','Blezt','Puls','MH','NRM','Disharmoni','Musikknyheter','Festivalguide','Tons of Rock','Oslo Pride','Gonzales','Rockman','Annet'];
+    const options = ['','Blezt','Puls','MetalHammer','NorwayRockMagazine','Disharmoni','Musikknyheter','Festivalguide','Tons of Rock','Oslo Pride','Gonzales','Rockman','Annet'];
     const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="shooting"]`);
     if (!cell) return;
     const original = cell.innerHTML;
