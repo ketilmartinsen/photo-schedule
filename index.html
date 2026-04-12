@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📸 Photo Schedule</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%B8%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📸</text></svg>">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -153,6 +153,7 @@
       cursor: pointer; border: none; background: transparent;
       color: var(--muted); border-bottom: 3px solid transparent;
       margin-bottom: -2px; transition: all 0.15s; letter-spacing: 0.3px;
+      text-decoration: none; display: inline-block;
     }
     .nav-tab:hover { color: var(--text); }
     .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -418,6 +419,8 @@
   <button class="nav-tab active" onclick="switchTab('schedule')">📋 Timeplan</button>
   <button class="nav-tab" onclick="switchTab('calendar')">📅 Kalender</button>
   <button class="nav-tab" onclick="switchTab('artists')">🏆 Artister</button>
+  <a class="nav-tab" href="portfolio.html" target="_blank">🌐 Portfolio</a>
+  <a class="nav-tab" href="report.html" target="_blank">📄 Årsrapport</a>
 </div>
 
 <!-- ── Schedule page ── -->
