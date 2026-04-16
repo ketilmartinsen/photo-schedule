@@ -374,6 +374,14 @@
     .notif-days { font-weight: 700; color: var(--danger); margin-right: 6px; }
     .notif-days.soon { color: var(--accent); }
 
+    /* ── Type manager ── */
+    .type-item { display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--surface2); border-radius:6px; border:1px solid var(--border); }
+    .type-item-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+    .type-item-name { flex:1; font-size:13px; font-weight:600; }
+    .type-item-default { font-size:10px; color:var(--muted); margin-left:4px; }
+    .type-item-del { background:transparent; color:var(--danger); border:1px solid var(--danger); padding:3px 8px; font-size:11px; border-radius:4px; cursor:pointer; }
+    .type-item-del:hover { background:var(--danger); color:#fff; }
+
     @media (max-width: 600px) {
       header, .year-bar, .toolbar, .table-wrap, .stats { padding-left: 14px; padding-right: 14px; }
       .form-grid { grid-template-columns: 1fr; }
@@ -410,6 +418,7 @@
     </div>
     <button class="btn-secondary" onclick="openImport()">⬆ Importer</button>
     <button class="btn-secondary" onclick="exportCSV()">⬇ Eksporter CSV</button>
+    <button class="btn-secondary" onclick="openTypeManager()" id="typeBtn">🏷 Typer</button>
     <button class="btn-primary" onclick="openModal()" id="addBtn" disabled>＋ Legg til event</button>
     <div style="position:relative">
       <button class="btn-secondary" onclick="toggleNotifications()" id="bellBtn" style="display:none" title="Kommende events uten akkreditering">🔔</button>
@@ -447,12 +456,8 @@
 <div class="toolbar">
   <input type="text" id="search" placeholder="🔍 Søk i alle år…" oninput="onSearchInput()">
   <span class="filter-label">Type:</span>
-  <div class="filter-pills">
-    <button class="pill active" data-filter="all"       onclick="setFilter('all',this)">Alle</button>
-    <button class="pill" data-filter="Konsert"          onclick="setFilter('Konsert',this)">Konsert</button>
-    <button class="pill" data-filter="Fotball"          onclick="setFilter('Fotball',this)">Fotball</button>
-    <button class="pill" data-filter="OsloPride"        onclick="setFilter('OsloPride',this)">Oslo Pride</button>
-    <button class="pill" data-filter="Annet"            onclick="setFilter('Annet',this)">Annet</button>
+  <div class="filter-pills" id="filterPillsType">
+    <!-- dynamically populated by rebuildFilterPills() -->
   </div>
   <span class="filter-label">Status:</span>
   <div class="filter-pills">
@@ -553,10 +558,7 @@
       <div class="form-group">
         <label>Type</label>
         <select id="f-type">
-          <option value="Konsert">Konsert</option>
-          <option value="Fotball">Fotball</option>
-          <option value="OsloPride">Oslo Pride</option>
-          <option value="Annet">Annet</option>
+          <!-- dynamically populated by rebuildTypeSelectOptions() -->
         </select>
       </div>
       <div class="form-group full">
@@ -629,10 +631,7 @@
       <div class="form-group">
         <label>Standard type</label>
         <select id="importType">
-          <option value="Konsert">Konsert</option>
-          <option value="Fotball">Fotball</option>
-          <option value="OsloPride">Oslo Pride</option>
-          <option value="Annet">Annet</option>
+          <!-- dynamically populated by rebuildTypeSelectOptions() -->
         </select>
       </div>
       <div class="form-group">
@@ -658,6 +657,29 @@
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeImport()">Avbryt</button>
       <button class="btn-primary" id="importBtn" onclick="runImport()" disabled>Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Type Manager Modal ── -->
+<div class="overlay" id="typeOverlay" onclick="closeTypeManagerOnBackdrop(event)">
+  <div class="modal" style="width:480px">
+    <h2>🏷 Administrer Typer</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:18px">Legg til eller slett egne event-typer. Standardtyper kan ikke slettes.</p>
+
+    <div id="typeList" style="margin-bottom:18px;display:flex;flex-direction:column;gap:8px"></div>
+
+    <div style="display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);padding-top:16px">
+      <input type="text" id="newTypeName" placeholder="Navn på ny type…" style="flex:1"
+        onkeydown="if(event.key==='Enter')addType()">
+      <input type="text" id="newTypeColor" placeholder="#aabbcc" style="width:90px"
+        title="Valgfri farge (hex)" value="">
+      <button class="btn-primary" onclick="addType()">＋ Legg til</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:6px">Farge er valgfri. Eksempler: #e056fd, #00cec9, #ff6eb4</p>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeTypeManager()">Lukk</button>
     </div>
   </div>
 </div>
@@ -709,9 +731,168 @@
   const YEARS = [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030];
   const DAYS  = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
 
+  // ── Default types (cannot be deleted) ─────────────────────────────────────
+  const DEFAULT_TYPES = [
+    { name: 'Konsert',   color: '#e056fd' },
+    { name: 'Fotball',   color: '#00cec9' },
+    { name: 'OsloPride', color: '#ff6eb4' },
+    { name: 'Annet',     color: '#a0aec0' },
+  ];
+  const DEFAULT_TYPE_NAMES = new Set(DEFAULT_TYPES.map(t => t.name));
+
+  // Active types list (default + custom). Loaded from Supabase / localStorage.
+  let customTypes = []; // [{name, color}] — user-added only
+  const LS_KEY = 'photo_schedule_custom_types';
+
+  function allTypes() {
+    return [...DEFAULT_TYPES, ...customTypes];
+  }
+
+  function typeColor(name) {
+    const t = allTypes().find(t => t.name === name);
+    return t ? t.color : '#a0aec0';
+  }
+
+  function typeClass(name) {
+    // Generate a safe CSS class name from type name
+    const safe = (name||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    return `type-${safe}`;
+  }
+
+  // ── Load / save custom types ───────────────────────────────────────────────
+  function loadTypesFromStorage() {
+    try {
+      const stored = localStorage.getItem(LS_KEY);
+      if (stored) customTypes = JSON.parse(stored);
+    } catch(e) { customTypes = []; }
+  }
+
+  function saveTypesToStorage() {
+    localStorage.setItem(LS_KEY, JSON.stringify(customTypes));
+  }
+
+  async function loadTypesFromSupabase() {
+    // Store custom types as a single JSON row in a key-value style
+    // We use the photo_schedule table's meta — actually we use localStorage
+    // as primary and optionally sync. For full persistence use a dedicated
+    // approach: store in a separate table if it exists, else localStorage.
+    // For now: localStorage is the store (works perfectly for single-user).
+    loadTypesFromStorage();
+    rebuildTypeUI();
+  }
+
+  // ── Rebuild all type-dependent UI ─────────────────────────────────────────
+  function rebuildTypeUI() {
+    rebuildFilterPills();
+    rebuildTypeSelectOptions();
+    renderTypeTotals();       // was wrongly named rebuildTypeTotals
+    injectTypeCSS();
+  }
+
+  function injectTypeCSS() {
+    let style = document.getElementById('dynamic-type-css');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'dynamic-type-css';
+      document.head.appendChild(style);
+    }
+    style.textContent = allTypes().map(t => {
+      const cls = typeClass(t.name);
+      return `.${cls} { color: ${t.color}; font-weight: 600; }`;
+    }).join('\n');
+  }
+
+  function rebuildFilterPills() {
+    const container = document.getElementById('filterPillsType');
+    if (!container) return;
+    container.innerHTML = `<button class="pill active" data-filter="all" onclick="setFilter('all',this)">Alle</button>` +
+      allTypes().map(t =>
+        `<button class="pill" data-filter="${t.name}" onclick="setFilter('${t.name}',this)">${t.name}</button>`
+      ).join('');
+  }
+
+  function rebuildTypeSelectOptions(selectedVal) {
+    ['f-type', 'importType'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const cur = selectedVal || sel.value;
+      sel.innerHTML = allTypes().map(t =>
+        `<option value="${t.name}"${t.name===cur?' selected':''}>${t.name}</option>`
+      ).join('');
+    });
+  }
+
+  // ── Type Manager ──────────────────────────────────────────────────────────
+  function openTypeManager() {
+    renderTypeList();
+    document.getElementById('typeOverlay').classList.add('open');
+    document.getElementById('newTypeName').focus();
+  }
+
+  function closeTypeManager() {
+    document.getElementById('typeOverlay').classList.remove('open');
+    document.getElementById('newTypeName').value = '';
+    document.getElementById('newTypeColor').value = '';
+  }
+
+  function closeTypeManagerOnBackdrop(e) {
+    if (e.target === document.getElementById('typeOverlay')) closeTypeManager();
+  }
+
+  function renderTypeList() {
+    const container = document.getElementById('typeList');
+    const rows = allTypes().map(t => {
+      const isDef = DEFAULT_TYPE_NAMES.has(t.name);
+      return `<div class="type-item">
+        <div class="type-item-dot" style="background:${t.color}"></div>
+        <div class="type-item-name">${t.name}${isDef?'<span class="type-item-default">(standard)</span>':''}</div>
+        ${!isDef ? `<button class="type-item-del" onclick="deleteType('${t.name.replace(/'/g,"\\'")}')">✕ Slett</button>` : ''}
+      </div>`;
+    });
+    container.innerHTML = rows.join('');
+  }
+
+  function addType() {
+    const nameEl  = document.getElementById('newTypeName');
+    const colorEl = document.getElementById('newTypeColor');
+    const name  = nameEl.value.trim();
+    const color = colorEl.value.trim() || randomTypeColor();
+
+    if (!name) { showToast('Skriv inn et navn på typen.', true); return; }
+    if (allTypes().find(t => t.name.toLowerCase() === name.toLowerCase())) {
+      showToast('En type med dette navnet finnes allerede.', true); return;
+    }
+    if (color && !/^#[0-9a-fA-F]{3,6}$/.test(color)) {
+      showToast('Ugyldig farge — bruk hex-format, f.eks. #e056fd', true); return;
+    }
+
+    customTypes.push({ name, color: color || randomTypeColor() });
+    saveTypesToStorage();
+    nameEl.value = '';
+    colorEl.value = '';
+    renderTypeList();
+    rebuildTypeUI();
+    showToast(`✓ Type "${name}" lagt til`);
+  }
+
+  function deleteType(name) {
+    if (DEFAULT_TYPE_NAMES.has(name)) { showToast('Standardtyper kan ikke slettes.', true); return; }
+    if (!confirm(`Slette typen "${name}"? Events med denne typen beholder sin type-verdi i databasen.`)) return;
+    customTypes = customTypes.filter(t => t.name !== name);
+    saveTypesToStorage();
+    renderTypeList();
+    rebuildTypeUI();
+    showToast(`✓ Type "${name}" slettet`);
+  }
+
+  function randomTypeColor() {
+    const colors = ['#f39c12','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c','#e67e22','#e91e63'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
   let events            = [];
   let allCounts         = {};
-  let globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0 };
+  let globalTypeCounts  = {};
   let globalVenueCounts = {};
   let globalShootingCounts = {};
   let totalSummaryOpen  = false;
@@ -755,10 +936,6 @@
     return {'Søke':'badge-apply','Har søkt':'badge-applied','Akkred Ok':'badge-ok','Ferdig':'badge-done'}[s] || 'badge-apply';
   }
 
-  function typeClass(t) {
-    return {'Konsert':'type-konsert','Fotball':'type-fotball','OsloPride':'type-oslopride','Annet':'type-annet'}[t] || '';
-  }
-
   // ── Year bar ───────────────────────────────────────────────
   async function buildYearBar() {
     const PAGE = 1000; let allData = []; let from = 0; let keepGoing = true;
@@ -769,7 +946,8 @@
     }
 
     allCounts = {};
-    globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0, 'Ikke utfylt': 0 };
+    globalTypeCounts  = Object.fromEntries(allTypes().map(t => [t.name, 0]));
+    globalTypeCounts['Ikke utfylt'] = 0;
     globalVenueCounts = {};
     globalShootingCounts = {};
     const todayStr = new Date().toISOString().substring(0, 10);
@@ -777,8 +955,11 @@
     allData.forEach(r => {
       if (r.date) { const y = parseInt(r.date.substring(0, 4)); allCounts[y] = (allCounts[y] || 0) + 1; }
       if (!r.date || r.date >= todayStr) return;
-      if (r.type && globalTypeCounts.hasOwnProperty(r.type)) globalTypeCounts[r.type]++;
-      else if (!r.type || !r.type.trim()) globalTypeCounts['Ikke utfylt']++;
+      if (r.type && r.type.trim()) {
+        globalTypeCounts[r.type] = (globalTypeCounts[r.type] || 0) + 1;
+      } else {
+        globalTypeCounts['Ikke utfylt']++;
+      }
       if (r.venue && r.venue.trim()) { const v = r.venue.trim(); globalVenueCounts[v] = (globalVenueCounts[v] || 0) + 1; }
       if (r.shooting && r.shooting.trim()) { const s = r.shooting.trim(); globalShootingCounts[s] = (globalShootingCounts[s] || 0) + 1; }
     });
@@ -802,17 +983,11 @@
     ['typeTotals', 'typeTotals2'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
-      const { Konsert, Fotball, OsloPride, Annet } = globalTypeCounts;
-      const fmt = n => n.toLocaleString('no-NO');
-      el.innerHTML = `
-        <span class="type-total-item"><span class="type-konsert">Konsert</span><strong>${fmt(Konsert)}</strong></span>
-        <span class="type-total-sep">·</span>
-        <span class="type-total-item"><span class="type-fotball">Fotball</span><strong>${fmt(Fotball)}</strong></span>
-        <span class="type-total-sep">·</span>
-        <span class="type-total-item"><span class="type-oslopride">Pride</span><strong>${fmt(OsloPride)}</strong></span>
-        <span class="type-total-sep">·</span>
-        <span class="type-total-item"><span class="type-annet">Annet</span><strong>${fmt(Annet)}</strong></span>
-      `;
+      const fmt = n => (n||0).toLocaleString('no-NO');
+      el.innerHTML = allTypes().map((t, i) =>
+        (i > 0 ? '<span class="type-total-sep">·</span>' : '') +
+        `<span class="type-total-item"><span class="${typeClass(t.name)}">${t.name}</span><strong>${fmt(globalTypeCounts[t.name]||0)}</strong></span>`
+      ).join('');
     });
   }
 
@@ -1269,12 +1444,11 @@
     toggle.style.display = evts.length === 0 ? 'none' : 'flex';
     if (evts.length === 0) { box.classList.remove('open'); summaryOpen = false; return; }
 
-    const types    = ['Konsert','Fotball','OsloPride','Annet'];
+    const types    = allTypes().map(t => t.name);
     const statuses = ['Søke','Har søkt','Akkred Ok','Ferdig'];
-    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
     const total = evts.length;
     const pct   = n => Math.round((n / total) * 100);
-    const typeCounts   = Object.fromEntries(types.map(t   => [t, evts.filter(e => e.type   === t).length]));
+    const typeCounts   = Object.fromEntries(types.map(t => [t, evts.filter(e => e.type === t).length]));
     const statusCounts = Object.fromEntries(statuses.map(s => [s, evts.filter(e => e.status === s).length]));
     const months = Array.from({length:12}, (_,i) => { const m = String(i+1).padStart(2,'0'); return evts.filter(e => e.date && e.date.substring(5,7) === m).length; });
     const maxM = Math.max(...months, 1);
@@ -1287,8 +1461,8 @@
         <div class="summary-block">
           <h4>Per type</h4>
           ${types.map(t => `
-            <div class="summary-row"><span style="color:${typeColors[t]}">${t}</span><strong>${typeCounts[t]}</strong></div>
-            <div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(typeCounts[t])}%;background:${typeColors[t]}"></div></div>
+            <div class="summary-row"><span style="color:${typeColor(t)}">${t}</span><strong>${typeCounts[t]||0}</strong></div>
+            <div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(typeCounts[t]||0)}%;background:${typeColor(t)}"></div></div>
           `).join('')}
         </div>
         <div class="summary-block">
@@ -1321,8 +1495,7 @@
   function renderTotalSummary() {
     const box = document.getElementById('totalSummary');
     if (!box) return;
-    const types      = ['Konsert','Fotball','OsloPride','Annet'];
-    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
+    const types = allTypes();
     const totalEvents = Object.values(globalTypeCounts).reduce((a,b) => a+b, 0);
     const pct = (n, tot) => tot > 0 ? Math.round((n / tot) * 100) : 0;
     const venueEntries = Object.entries(globalVenueCounts).filter(([k]) => k).sort((a,b) => b[1]-a[1]).slice(0,15);
@@ -1335,8 +1508,8 @@
         <div class="summary-block">
           <h4>Per type – alle år (${totalEvents} totalt)</h4>
           ${types.map(t => `
-            <div class="summary-row"><span style="color:${typeColors[t]}">${t}</span><strong>${globalTypeCounts[t]}</strong></div>
-            <div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(globalTypeCounts[t], totalEvents)}%;background:${typeColors[t]}"></div></div>
+            <div class="summary-row"><span style="color:${t.color}">${t.name}</span><strong>${globalTypeCounts[t.name]||0}</strong></div>
+            <div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(globalTypeCounts[t.name]||0, totalEvents)}%;background:${t.color}"></div></div>
           `).join('')}
         </div>
         <div class="summary-block" style="min-width:260px">
@@ -1556,7 +1729,7 @@
     const top3     = sorted.slice(0, 3);
     const rest     = sorted.slice(3, 50);
     const maxCount = sorted.length > 0 ? sorted[0][1] : 1;
-    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
+    const typeColors = Object.fromEntries(allTypes().map(t => [t.name, t.color]));
     const medals = ['🥇','🥈','🥉'];
     const barClasses = ['gold','silver','bronze'];
     const heights = [120, 90, 70];
@@ -1583,7 +1756,11 @@
   }
 
   // ── Init ───────────────────────────────────────────────────
-  async function init() { await buildYearBar(); await loadEvents(); }
+  async function init() {
+    await loadTypesFromSupabase();   // load custom types first
+    await buildYearBar();
+    await loadEvents();
+  }
 
   document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
   document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPassword').focus(); });
