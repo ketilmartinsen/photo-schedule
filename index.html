@@ -759,33 +759,86 @@
     return `type-${safe}`;
   }
 
-  // ── Load / save custom types ───────────────────────────────────────────────
-  function loadTypesFromStorage() {
-    try {
-      const stored = localStorage.getItem(LS_KEY);
-      if (stored) customTypes = JSON.parse(stored);
-    } catch(e) { customTypes = []; }
-  }
-
-  function saveTypesToStorage() {
-    localStorage.setItem(LS_KEY, JSON.stringify(customTypes));
-  }
-
+  // ── Load / save types from Supabase ───────────────────────────────────────
   async function loadTypesFromSupabase() {
-    // Store custom types as a single JSON row in a key-value style
-    // We use the photo_schedule table's meta — actually we use localStorage
-    // as primary and optionally sync. For full persistence use a dedicated
-    // approach: store in a separate table if it exists, else localStorage.
-    // For now: localStorage is the store (works perfectly for single-user).
-    loadTypesFromStorage();
+    try {
+      const { data, error } = await db.from('event_types')
+        .select('name, color, is_default')
+        .order('sort_order', { ascending: true })
+        .order('id', { ascending: true });
+
+      if (error) throw error;
+
+      // Separate defaults and customs from DB
+      // (defaults are always shown from DEFAULT_TYPES for display order control)
+      customTypes = (data || []).filter(t => !t.is_default);
+    } catch(e) {
+      // Fallback to localStorage if DB unavailable
+      console.warn('Could not load types from Supabase, using localStorage:', e);
+      try {
+        const stored = localStorage.getItem(LS_KEY);
+        if (stored) customTypes = JSON.parse(stored);
+      } catch(_) { customTypes = []; }
+    }
     rebuildTypeUI();
+  }
+
+  async function addType() {
+    const nameEl  = document.getElementById('newTypeName');
+    const colorEl = document.getElementById('newTypeColor');
+    const name    = nameEl.value.trim();
+    const rawColor = colorEl.value.trim();
+    const color   = rawColor || randomTypeColor();
+
+    if (!name) { showToast('Skriv inn et navn på typen.', true); return; }
+    if (allTypes().find(t => t.name.toLowerCase() === name.toLowerCase())) {
+      showToast('En type med dette navnet finnes allerede.', true); return;
+    }
+    if (rawColor && !/^#[0-9a-fA-F]{3,6}$/.test(rawColor)) {
+      showToast('Ugyldig farge — bruk hex-format, f.eks. #e056fd', true); return;
+    }
+
+    const sortOrder = 100 + customTypes.length;
+    const { error } = await db.from('event_types')
+      .insert({ name, color, is_default: false, sort_order: sortOrder });
+
+    if (error) { showToast('Feil ved lagring: ' + error.message, true); return; }
+
+    customTypes.push({ name, color });
+    // Also sync to localStorage as backup
+    localStorage.setItem(LS_KEY, JSON.stringify(customTypes));
+
+    nameEl.value = '';
+    colorEl.value = '';
+    renderTypeList();
+    rebuildTypeUI();
+    showToast(`✓ Type "${name}" lagt til`);
+  }
+
+  async function deleteType(name) {
+    if (DEFAULT_TYPE_NAMES.has(name)) { showToast('Standardtyper kan ikke slettes.', true); return; }
+    if (!confirm(`Slette typen "${name}"? Events med denne typen beholder sin type-verdi i databasen.`)) return;
+
+    const { error } = await db.from('event_types').delete().eq('name', name).eq('is_default', false);
+    if (error) { showToast('Feil ved sletting: ' + error.message, true); return; }
+
+    customTypes = customTypes.filter(t => t.name !== name);
+    localStorage.setItem(LS_KEY, JSON.stringify(customTypes));
+    renderTypeList();
+    rebuildTypeUI();
+    showToast(`✓ Type "${name}" slettet`);
+  }
+
+  function randomTypeColor() {
+    const colors = ['#f39c12','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c','#e67e22','#e91e63'];
+    return colors[Math.floor(Math.random() * colors.length)];
   }
 
   // ── Rebuild all type-dependent UI ─────────────────────────────────────────
   function rebuildTypeUI() {
     rebuildFilterPills();
     rebuildTypeSelectOptions();
-    renderTypeTotals();       // was wrongly named rebuildTypeTotals
+    renderTypeTotals();
     injectTypeCSS();
   }
 
@@ -822,11 +875,11 @@
     });
   }
 
-  // ── Type Manager ──────────────────────────────────────────────────────────
+  // ── Type Manager modal helpers ─────────────────────────────────────────────
   function openTypeManager() {
     renderTypeList();
     document.getElementById('typeOverlay').classList.add('open');
-    document.getElementById('newTypeName').focus();
+    setTimeout(() => document.getElementById('newTypeName').focus(), 100);
   }
 
   function closeTypeManager() {
@@ -841,53 +894,14 @@
 
   function renderTypeList() {
     const container = document.getElementById('typeList');
-    const rows = allTypes().map(t => {
+    container.innerHTML = allTypes().map(t => {
       const isDef = DEFAULT_TYPE_NAMES.has(t.name);
       return `<div class="type-item">
         <div class="type-item-dot" style="background:${t.color}"></div>
-        <div class="type-item-name">${t.name}${isDef?'<span class="type-item-default">(standard)</span>':''}</div>
+        <div class="type-item-name">${t.name}${isDef ? '<span class="type-item-default">(standard)</span>' : ''}</div>
         ${!isDef ? `<button class="type-item-del" onclick="deleteType('${t.name.replace(/'/g,"\\'")}')">✕ Slett</button>` : ''}
       </div>`;
-    });
-    container.innerHTML = rows.join('');
-  }
-
-  function addType() {
-    const nameEl  = document.getElementById('newTypeName');
-    const colorEl = document.getElementById('newTypeColor');
-    const name  = nameEl.value.trim();
-    const color = colorEl.value.trim() || randomTypeColor();
-
-    if (!name) { showToast('Skriv inn et navn på typen.', true); return; }
-    if (allTypes().find(t => t.name.toLowerCase() === name.toLowerCase())) {
-      showToast('En type med dette navnet finnes allerede.', true); return;
-    }
-    if (color && !/^#[0-9a-fA-F]{3,6}$/.test(color)) {
-      showToast('Ugyldig farge — bruk hex-format, f.eks. #e056fd', true); return;
-    }
-
-    customTypes.push({ name, color: color || randomTypeColor() });
-    saveTypesToStorage();
-    nameEl.value = '';
-    colorEl.value = '';
-    renderTypeList();
-    rebuildTypeUI();
-    showToast(`✓ Type "${name}" lagt til`);
-  }
-
-  function deleteType(name) {
-    if (DEFAULT_TYPE_NAMES.has(name)) { showToast('Standardtyper kan ikke slettes.', true); return; }
-    if (!confirm(`Slette typen "${name}"? Events med denne typen beholder sin type-verdi i databasen.`)) return;
-    customTypes = customTypes.filter(t => t.name !== name);
-    saveTypesToStorage();
-    renderTypeList();
-    rebuildTypeUI();
-    showToast(`✓ Type "${name}" slettet`);
-  }
-
-  function randomTypeColor() {
-    const colors = ['#f39c12','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c','#e67e22','#e91e63'];
-    return colors[Math.floor(Math.random() * colors.length)];
+    }).join('');
   }
 
   let events            = [];
