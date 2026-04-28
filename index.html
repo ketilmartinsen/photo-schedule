@@ -62,23 +62,6 @@
     .btn-edit:hover { background: var(--accent); color: #000; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── Year bar ── */
-    .year-bar {
-      background: #111;
-      border-bottom: 1px solid var(--border);
-      padding: 10px 28px;
-      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    }
-    .year-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-right: 6px; }
-    .year-btn {
-      cursor: pointer; padding: 4px 13px; border-radius: 20px;
-      border: 1px solid var(--border); font-size: 12px; font-weight: 700;
-      background: transparent; color: var(--muted); transition: all 0.15s;
-    }
-    .year-btn:hover  { border-color: var(--accent); color: var(--accent); }
-    .year-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
-    .year-count { font-size: 10px; opacity: 0.7; margin-left: 2px; }
-
     /* ── Toolbar ── */
     .toolbar {
       padding: 12px 28px;
@@ -116,7 +99,7 @@
     .stat { font-size: 12px; color: var(--muted); }
     .stat strong { color: var(--text); }
 
-    /* ── Photo status dot ── */
+    /* ── Photo dot ── */
     .photo-dot {
       display: inline-block; width: 10px; height: 10px; border-radius: 50%;
       flex-shrink: 0; margin: 0 auto;
@@ -158,6 +141,7 @@
     .nav-tabs {
       display: flex; gap: 0; border-bottom: 2px solid var(--border);
       background: var(--surface); padding: 0 28px;
+      align-items: center;
     }
     .nav-tab {
       padding: 10px 20px; font-size: 13px; font-weight: 700;
@@ -168,6 +152,26 @@
     }
     .nav-tab:hover { color: var(--text); }
     .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Year dropdown in nav ── */
+    .year-select {
+      margin-left: auto;
+      margin-right: 28px;
+      width: auto;
+      background: var(--surface2);
+      color: var(--accent);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .year-select:hover, .year-select:focus { border-color: var(--accent); outline: none; }
+    .nav-tabs .year-select { width: auto !important; }
+    .year-select option { background: var(--surface2); color: var(--text); }
 
     /* ── Page panels ── */
     .page-panel { display: none; }
@@ -244,7 +248,7 @@
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group.full { grid-column: 1 / -1; }
     label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); }
-    input[type="date"], input[type="text"], input[type="url"], select, textarea {
+    input[type="date"], input[type="text"], select, textarea {
       background: var(--surface2); border: 1px solid var(--border); color: var(--text);
       border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; width: 100%; transition: border-color 0.15s;
     }
@@ -274,7 +278,7 @@
     .import-count { font-size: 12px; color: var(--muted); margin-top: 8px; }
     .import-count strong { color: var(--accent); }
     .import-progress { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 10px; display: none; }
-    .import-progress-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.2s; width: 0%; }
+    .import-progress-bar { height: 3px; background: var(--accent); border-radius: 2px; transition: width 0.2s; width: 0%; }
 
     /* ── Login screen ── */
     .login-screen {
@@ -323,10 +327,8 @@
       color: var(--text); border-radius: 4px; padding: 3px 6px;
       font-size: 12px; font-family: inherit; width: 100%;
     }
-    td.editable-status, td.editable-comment, td.editable-shooting,
-    td.editable-photo-url { cursor: pointer; }
-    td.editable-status:hover, td.editable-comment:hover,
-    td.editable-shooting:hover, td.editable-photo-url:hover { background: var(--surface2); }
+    td.editable-status, td.editable-comment, td.editable-shooting { cursor: pointer; }
+    td.editable-status:hover, td.editable-comment:hover, td.editable-shooting:hover { background: var(--surface2); }
 
     /* ── Year summary ── */
     .year-summary {
@@ -374,16 +376,8 @@
     .notif-days { font-weight: 700; color: var(--danger); margin-right: 6px; }
     .notif-days.soon { color: var(--accent); }
 
-    /* ── Type manager ── */
-    .type-item { display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--surface2); border-radius:6px; border:1px solid var(--border); }
-    .type-item-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
-    .type-item-name { flex:1; font-size:13px; font-weight:600; }
-    .type-item-default { font-size:10px; color:var(--muted); margin-left:4px; }
-    .type-item-del { background:transparent; color:var(--danger); border:1px solid var(--danger); padding:3px 8px; font-size:11px; border-radius:4px; cursor:pointer; }
-    .type-item-del:hover { background:var(--danger); color:#fff; }
-
     @media (max-width: 600px) {
-      header, .year-bar, .toolbar, .table-wrap, .stats { padding-left: 14px; padding-right: 14px; }
+      header, .toolbar, .table-wrap, .stats { padding-left: 14px; padding-right: 14px; }
       .form-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -418,7 +412,6 @@
     </div>
     <button class="btn-secondary" onclick="openImport()">⬆ Importer</button>
     <button class="btn-secondary" onclick="exportCSV()">⬇ Eksporter CSV</button>
-    <button class="btn-secondary" onclick="openTypeManager()" id="typeBtn">🏷 Typer</button>
     <button class="btn-primary" onclick="openModal()" id="addBtn" disabled>＋ Legg til event</button>
     <div style="position:relative">
       <button class="btn-secondary" onclick="toggleNotifications()" id="bellBtn" style="display:none" title="Kommende events uten akkreditering">🔔</button>
@@ -442,22 +435,22 @@
   <button class="nav-tab" onclick="switchTab('artists')">🏆 Artister</button>
   <a class="nav-tab" href="portfolio.html" target="_blank">🌐 Portfolio</a>
   <a class="nav-tab" href="report.html" target="_blank">📄 Årsrapport</a>
+  <select id="yearSelect" class="year-select" onchange="selectYear(parseInt(this.value))"></select>
 </div>
 
 <!-- ── Schedule page ── -->
 <div class="page-panel active" id="page-schedule">
 
-<!-- ── Year bar ── -->
-<div class="year-bar" id="yearBar">
-  <span class="year-label">År:</span>
-</div>
-
 <!-- ── Toolbar ── -->
 <div class="toolbar">
   <input type="text" id="search" placeholder="🔍 Søk i alle år…" oninput="onSearchInput()">
   <span class="filter-label">Type:</span>
-  <div class="filter-pills" id="filterPillsType">
-    <!-- dynamically populated by rebuildFilterPills() -->
+  <div class="filter-pills">
+    <button class="pill active" data-filter="all"       onclick="setFilter('all',this)">Alle</button>
+    <button class="pill" data-filter="Konsert"          onclick="setFilter('Konsert',this)">Konsert</button>
+    <button class="pill" data-filter="Fotball"          onclick="setFilter('Fotball',this)">Fotball</button>
+    <button class="pill" data-filter="OsloPride"        onclick="setFilter('OsloPride',this)">Oslo Pride</button>
+    <button class="pill" data-filter="Annet"            onclick="setFilter('Annet',this)">Annet</button>
   </div>
   <span class="filter-label">Status:</span>
   <div class="filter-pills">
@@ -546,7 +539,7 @@
   </div>
 </div>
 
-<!-- ── Add/Edit Modal ── -->
+<!-- ── Event modal ── -->
 <div class="overlay" id="overlay" onclick="closeOnBackdrop(event)">
   <div class="modal">
     <h2 id="modalTitle">Legg til event</h2>
@@ -558,7 +551,10 @@
       <div class="form-group">
         <label>Type</label>
         <select id="f-type">
-          <!-- dynamically populated by rebuildTypeSelectOptions() -->
+          <option value="Konsert">Konsert</option>
+          <option value="Fotball">Fotball</option>
+          <option value="OsloPride">Oslo Pride</option>
+          <option value="Annet">Annet</option>
         </select>
       </div>
       <div class="form-group full">
@@ -631,7 +627,10 @@
       <div class="form-group">
         <label>Standard type</label>
         <select id="importType">
-          <!-- dynamically populated by rebuildTypeSelectOptions() -->
+          <option value="Konsert">Konsert</option>
+          <option value="Fotball">Fotball</option>
+          <option value="OsloPride">Oslo Pride</option>
+          <option value="Annet">Annet</option>
         </select>
       </div>
       <div class="form-group">
@@ -661,39 +660,16 @@
   </div>
 </div>
 
-<!-- ── Type Manager Modal ── -->
-<div class="overlay" id="typeOverlay" onclick="closeTypeManagerOnBackdrop(event)">
-  <div class="modal" style="width:480px">
-    <h2>🏷 Administrer Typer</h2>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:18px">Legg til eller slett egne event-typer. Standardtyper kan ikke slettes.</p>
-
-    <div id="typeList" style="margin-bottom:18px;display:flex;flex-direction:column;gap:8px"></div>
-
-    <div style="display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);padding-top:16px">
-      <input type="text" id="newTypeName" placeholder="Navn på ny type…" style="flex:1"
-        onkeydown="if(event.key==='Enter')addType()">
-      <input type="text" id="newTypeColor" placeholder="#aabbcc" style="width:90px"
-        title="Valgfri farge (hex)" value="">
-      <button class="btn-primary" onclick="addType()">＋ Legg til</button>
-    </div>
-    <p style="font-size:11px;color:var(--muted);margin-top:6px">Farge er valgfri. Eksempler: #e056fd, #00cec9, #ff6eb4</p>
-
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeTypeManager()">Lukk</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Config ─────────────────────────────────────────────────
+  // ── Config ──────────────────────────────────────────────────
   const SUPA_URL = 'https://hgsvsisnauzrlwqaicim.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnc3ZzaXNuYXV6cmx3cWFpY2ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3Mjk1MjIsImV4cCI6MjA5MTMwNTUyMn0.FrvfXV3b7zC7ct8S9Y4rbMPYWkDEnG3bZW3Kt0Rn-zw';
   const db    = supabase.createClient(SUPA_URL, SUPA_KEY);
   const TABLE = 'photo_schedule';
 
-  // ── Auth ───────────────────────────────────────────────────
+  // ── Auth ────────────────────────────────────────────────────
   function showLoginScreen(visible) {
     document.getElementById('loginScreen').classList.toggle('visible', visible);
     document.getElementById('logoutBtn').style.display = visible ? 'none' : '';
@@ -723,194 +699,19 @@
       events = [];
       document.getElementById('tableBody').innerHTML = '';
       document.getElementById('stats').innerHTML = '';
-      document.getElementById('yearBar').innerHTML = '<span class="year-label">År:</span>';
       document.getElementById('addBtn').disabled = true;
     }
   });
 
-  const YEARS = [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030];
-  const DAYS  = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
-
-  // ── Default types (cannot be deleted) ─────────────────────────────────────
-  const DEFAULT_TYPES = [
-    { name: 'Konsert',   color: '#e056fd' },
-    { name: 'Fotball',   color: '#00cec9' },
-    { name: 'OsloPride', color: '#ff6eb4' },
-    { name: 'Annet',     color: '#a0aec0' },
-  ];
-  const DEFAULT_TYPE_NAMES = new Set(DEFAULT_TYPES.map(t => t.name));
-
-  // Active types list (default + custom). Loaded from Supabase / localStorage.
-  let customTypes = []; // [{name, color}] — user-added only
-  const LS_KEY = 'photo_schedule_custom_types';
-
-  function allTypes() {
-    return [...DEFAULT_TYPES, ...customTypes];
-  }
-
-  function typeColor(name) {
-    const t = allTypes().find(t => t.name === name);
-    return t ? t.color : '#a0aec0';
-  }
-
-  function typeClass(name) {
-    // Generate a safe CSS class name from type name
-    const safe = (name||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-    return `type-${safe}`;
-  }
-
-  // ── Load / save types from Supabase ───────────────────────────────────────
-  async function loadTypesFromSupabase() {
-    try {
-      const { data, error } = await db.from('event_types')
-        .select('name, color, is_default')
-        .order('sort_order', { ascending: true })
-        .order('id', { ascending: true });
-
-      if (error) throw error;
-
-      // Separate defaults and customs from DB
-      // (defaults are always shown from DEFAULT_TYPES for display order control)
-      customTypes = (data || []).filter(t => !t.is_default);
-    } catch(e) {
-      // Fallback to localStorage if DB unavailable
-      console.warn('Could not load types from Supabase, using localStorage:', e);
-      try {
-        const stored = localStorage.getItem(LS_KEY);
-        if (stored) customTypes = JSON.parse(stored);
-      } catch(_) { customTypes = []; }
-    }
-    rebuildTypeUI();
-  }
-
-  async function addType() {
-    const nameEl  = document.getElementById('newTypeName');
-    const colorEl = document.getElementById('newTypeColor');
-    const name    = nameEl.value.trim();
-    const rawColor = colorEl.value.trim();
-    const color   = rawColor || randomTypeColor();
-
-    if (!name) { showToast('Skriv inn et navn på typen.', true); return; }
-    if (allTypes().find(t => t.name.toLowerCase() === name.toLowerCase())) {
-      showToast('En type med dette navnet finnes allerede.', true); return;
-    }
-    if (rawColor && !/^#[0-9a-fA-F]{3,6}$/.test(rawColor)) {
-      showToast('Ugyldig farge — bruk hex-format, f.eks. #e056fd', true); return;
-    }
-
-    const sortOrder = 100 + customTypes.length;
-    const { error } = await db.from('event_types')
-      .insert({ name, color, is_default: false, sort_order: sortOrder });
-
-    if (error) { showToast('Feil ved lagring: ' + error.message, true); return; }
-
-    customTypes.push({ name, color });
-    // Also sync to localStorage as backup
-    localStorage.setItem(LS_KEY, JSON.stringify(customTypes));
-
-    nameEl.value = '';
-    colorEl.value = '';
-    renderTypeList();
-    rebuildTypeUI();
-    showToast(`✓ Type "${name}" lagt til`);
-  }
-
-  async function deleteType(name) {
-    if (DEFAULT_TYPE_NAMES.has(name)) { showToast('Standardtyper kan ikke slettes.', true); return; }
-    if (!confirm(`Slette typen "${name}"? Events med denne typen beholder sin type-verdi i databasen.`)) return;
-
-    const { error } = await db.from('event_types').delete().eq('name', name).eq('is_default', false);
-    if (error) { showToast('Feil ved sletting: ' + error.message, true); return; }
-
-    customTypes = customTypes.filter(t => t.name !== name);
-    localStorage.setItem(LS_KEY, JSON.stringify(customTypes));
-    renderTypeList();
-    rebuildTypeUI();
-    showToast(`✓ Type "${name}" slettet`);
-  }
-
-  function randomTypeColor() {
-    const colors = ['#f39c12','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c','#e67e22','#e91e63'];
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
-
-  // ── Rebuild all type-dependent UI ─────────────────────────────────────────
-  function rebuildTypeUI() {
-    rebuildFilterPills();
-    rebuildTypeSelectOptions();
-    renderTypeTotals();
-    injectTypeCSS();
-  }
-
-  function injectTypeCSS() {
-    let style = document.getElementById('dynamic-type-css');
-    if (!style) {
-      style = document.createElement('style');
-      style.id = 'dynamic-type-css';
-      document.head.appendChild(style);
-    }
-    style.textContent = allTypes().map(t => {
-      const cls = typeClass(t.name);
-      return `.${cls} { color: ${t.color}; font-weight: 600; }`;
-    }).join('\n');
-  }
-
-  function rebuildFilterPills() {
-    const container = document.getElementById('filterPillsType');
-    if (!container) return;
-    container.innerHTML = `<button class="pill active" data-filter="all" onclick="setFilter('all',this)">Alle</button>` +
-      allTypes().map(t =>
-        `<button class="pill" data-filter="${t.name}" onclick="setFilter('${t.name}',this)">${t.name}</button>`
-      ).join('');
-  }
-
-  function rebuildTypeSelectOptions(selectedVal) {
-    ['f-type', 'importType'].forEach(id => {
-      const sel = document.getElementById(id);
-      if (!sel) return;
-      const cur = selectedVal || sel.value;
-      sel.innerHTML = allTypes().map(t =>
-        `<option value="${t.name}"${t.name===cur?' selected':''}>${t.name}</option>`
-      ).join('');
-    });
-  }
-
-  // ── Type Manager modal helpers ─────────────────────────────────────────────
-  function openTypeManager() {
-    renderTypeList();
-    document.getElementById('typeOverlay').classList.add('open');
-    setTimeout(() => document.getElementById('newTypeName').focus(), 100);
-  }
-
-  function closeTypeManager() {
-    document.getElementById('typeOverlay').classList.remove('open');
-    document.getElementById('newTypeName').value = '';
-    document.getElementById('newTypeColor').value = '';
-  }
-
-  function closeTypeManagerOnBackdrop(e) {
-    if (e.target === document.getElementById('typeOverlay')) closeTypeManager();
-  }
-
-  function renderTypeList() {
-    const container = document.getElementById('typeList');
-    container.innerHTML = allTypes().map(t => {
-      const isDef = DEFAULT_TYPE_NAMES.has(t.name);
-      return `<div class="type-item">
-        <div class="type-item-dot" style="background:${t.color}"></div>
-        <div class="type-item-name">${t.name}${isDef ? '<span class="type-item-default">(standard)</span>' : ''}</div>
-        ${!isDef ? `<button class="type-item-del" onclick="deleteType('${t.name.replace(/'/g,"\\'")}')">✕ Slett</button>` : ''}
-      </div>`;
-    }).join('');
-  }
+  const DAYS = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
 
   let events            = [];
   let allCounts         = {};
-  let globalTypeCounts  = {};
+  let globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0 };
   let globalVenueCounts = {};
   let globalShootingCounts = {};
   let totalSummaryOpen  = false;
-  let selectedYear      = 2026;
+  let selectedYear      = new Date().getFullYear();
   let editId            = null;
   let filterType        = 'all';
   let filterStatus      = null;
@@ -923,7 +724,7 @@
   let calAllEvents      = [];
   let activeTab         = 'schedule';
 
-  // ── Helpers ────────────────────────────────────────────────
+  // ── Helpers ─────────────────────────────────────────────────
   function setSyncState(state, label) {
     document.getElementById('syncDot').className = 'sync-dot ' + state;
     document.getElementById('syncLabel').textContent = label;
@@ -937,21 +738,13 @@
     t._timer = setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  function esc(str) {
-    return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+  function esc(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function getDay(dateStr) { if (!dateStr) return ''; return DAYS[new Date(dateStr + 'T12:00:00').getDay()]; }
+  function badgeClass(s) { return {'Søke':'badge-apply','Har søkt':'badge-applied','Akkred Ok':'badge-ok','Ferdig':'badge-done'}[s] || 'badge-apply'; }
+  function typeClass(t)  { return {'Konsert':'type-konsert','Fotball':'type-fotball','OsloPride':'type-oslopride','Annet':'type-annet'}[t] || ''; }
 
-  function getDay(dateStr) {
-    if (!dateStr) return '';
-    return DAYS[new Date(dateStr + 'T12:00:00').getDay()];
-  }
-
-  function badgeClass(s) {
-    return {'Søke':'badge-apply','Har søkt':'badge-applied','Akkred Ok':'badge-ok','Ferdig':'badge-done'}[s] || 'badge-apply';
-  }
-
-  // ── Year bar ───────────────────────────────────────────────
-  async function buildYearBar() {
+  // ── Year dropdown ────────────────────────────────────────────
+  async function buildYearDropdown() {
     const PAGE = 1000; let allData = []; let from = 0; let keepGoing = true;
     while (keepGoing) {
       const { data, error } = await db.from(TABLE).select('date, type, venue, shooting').range(from, from + PAGE - 1);
@@ -959,53 +752,64 @@
       else { allData = allData.concat(data); keepGoing = data.length === PAGE; from += PAGE; }
     }
 
-    allCounts = {};
-    globalTypeCounts  = Object.fromEntries(allTypes().map(t => [t.name, 0]));
-    globalTypeCounts['Ikke utfylt'] = 0;
+    allCounts         = {};
+    globalTypeCounts  = { Konsert: 0, Fotball: 0, OsloPride: 0, Annet: 0, 'Ikke utfylt': 0 };
     globalVenueCounts = {};
     globalShootingCounts = {};
+
     const todayStr = new Date().toISOString().substring(0, 10);
 
     allData.forEach(r => {
-      if (r.date) { const y = parseInt(r.date.substring(0, 4)); allCounts[y] = (allCounts[y] || 0) + 1; }
+      if (r.date) {
+        const y = parseInt(r.date.substring(0, 4));
+        allCounts[y] = (allCounts[y] || 0) + 1;
+      }
       if (!r.date || r.date >= todayStr) return;
-      if (r.type && r.type.trim()) {
-        globalTypeCounts[r.type] = (globalTypeCounts[r.type] || 0) + 1;
-      } else {
+      if (r.type && globalTypeCounts.hasOwnProperty(r.type)) {
+        globalTypeCounts[r.type]++;
+      } else if (!r.type || !r.type.trim()) {
         globalTypeCounts['Ikke utfylt']++;
       }
-      if (r.venue && r.venue.trim()) { const v = r.venue.trim(); globalVenueCounts[v] = (globalVenueCounts[v] || 0) + 1; }
-      if (r.shooting && r.shooting.trim()) { const s = r.shooting.trim(); globalShootingCounts[s] = (globalShootingCounts[s] || 0) + 1; }
+      if (r.venue && r.venue.trim()) {
+        const v = r.venue.trim(); globalVenueCounts[v] = (globalVenueCounts[v] || 0) + 1;
+      }
+      if (r.shooting && r.shooting.trim()) {
+        const s = r.shooting.trim(); globalShootingCounts[s] = (globalShootingCounts[s] || 0) + 1;
+      }
     });
 
-    const bar = document.getElementById('yearBar');
-    bar.innerHTML = '<span class="year-label">År:</span>';
-    YEARS.forEach(y => {
+    // Build dropdown from years that actually have data, plus current + next 2 years
+    const dataYears = Object.keys(allCounts).map(Number);
+    const currentYear = new Date().getFullYear();
+    const allYears = [...new Set([...dataYears, currentYear, currentYear + 1, currentYear + 2])].sort((a, b) => a - b);
+
+    const sel = document.getElementById('yearSelect');
+    sel.innerHTML = allYears.map(y => {
       const cnt = allCounts[y] || 0;
-      const btn = document.createElement('button');
-      btn.className = 'year-btn' + (y === selectedYear ? ' active' : '');
-      btn.innerHTML = `${y}<span class="year-count">${cnt > 0 ? '('+cnt+')' : ''}</span>`;
-      btn.onclick = () => selectYear(y);
-      bar.appendChild(btn);
-    });
+      return `<option value="${y}" ${y === selectedYear ? 'selected' : ''}>${y}${cnt ? ' ('+cnt+')' : ''}</option>`;
+    }).join('');
 
     renderTypeTotals();
     renderTotalSummary();
   }
 
   function renderTypeTotals() {
-    ['typeTotals', 'typeTotals2'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const fmt = n => (n||0).toLocaleString('no-NO');
-      el.innerHTML = allTypes().map((t, i) =>
-        (i > 0 ? '<span class="type-total-sep">·</span>' : '') +
-        `<span class="type-total-item"><span class="${typeClass(t.name)}">${t.name}</span><strong>${fmt(globalTypeCounts[t.name]||0)}</strong></span>`
-      ).join('');
-    });
+    const ids = ['typeTotals', 'typeTotals2'];
+    const { Konsert, Fotball, OsloPride, Annet } = globalTypeCounts;
+    const fmt = n => n.toLocaleString('no-NO');
+    const html = `
+      <span class="type-total-item"><span class="type-konsert">Konsert</span><strong>${fmt(Konsert)}</strong></span>
+      <span class="type-total-sep">·</span>
+      <span class="type-total-item"><span class="type-fotball">Fotball</span><strong>${fmt(Fotball)}</strong></span>
+      <span class="type-total-sep">·</span>
+      <span class="type-total-item"><span class="type-oslopride">Pride</span><strong>${fmt(OsloPride)}</strong></span>
+      <span class="type-total-sep">·</span>
+      <span class="type-total-item"><span class="type-annet">Annet</span><strong>${fmt(Annet)}</strong></span>
+    `;
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = html; });
   }
 
-  // ── Search ─────────────────────────────────────────────────
+  // ── Search ───────────────────────────────────────────────────
   function onSearchInput() {
     const q = (document.getElementById('search').value || '').trim();
     if (q.length >= 2) { doGlobalSearch(q); }
@@ -1018,8 +822,7 @@
       .or(`artist.ilike.%${q}%,venue.ilike.%${q}%,comment.ilike.%${q}%`)
       .order('date', { ascending: true });
     if (error) { setSyncState('error', 'Søkefeil'); showToast('Søkefeil: ' + error.message, true); return; }
-    globalSearchMode = true;
-    globalResults    = data || [];
+    globalSearchMode = true; globalResults = data || [];
     setSyncState('online', 'Tilkoblet');
     renderTable();
   }
@@ -1027,12 +830,13 @@
   function selectYear(year) {
     selectedYear = year;
     if (globalSearchMode) { globalSearchMode = false; globalResults = []; document.getElementById('search').value = ''; }
-    document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.year-btn').forEach(b => { if (b.textContent.startsWith(year)) b.classList.add('active'); });
+    // Keep dropdown in sync
+    const sel = document.getElementById('yearSelect');
+    if (sel) sel.value = year;
     loadEvents();
   }
 
-  // ── Load data ──────────────────────────────────────────────
+  // ── Load data ────────────────────────────────────────────────
   async function loadEvents() {
     setSyncState('saving', 'Laster…');
     showLoadingSkeleton();
@@ -1043,11 +847,18 @@
     events = data || [];
     setSyncState('online', 'Tilkoblet');
     document.getElementById('addBtn').disabled = false;
+
+    // Update count in dropdown option
+    const sel = document.getElementById('yearSelect');
+    if (sel) {
+      Array.from(sel.options).forEach(opt => {
+        if (parseInt(opt.value) === selectedYear) {
+          opt.text = `${selectedYear}${events.length ? ' ('+events.length+')' : ''}`;
+        }
+      });
+    }
+
     renderTypeTotals();
-    document.querySelectorAll('.year-btn').forEach(b => {
-      const y = parseInt(b.textContent);
-      if (y === selectedYear) b.innerHTML = `${y}<span class="year-count">${events.length > 0 ? '('+events.length+')' : ''}</span>`;
-    });
     renderTable();
     buildNotifications(events);
     renderYearSummary(events);
@@ -1055,17 +866,17 @@
 
   function showLoadingSkeleton() {
     document.getElementById('tableBody').innerHTML = Array(4).fill('').map(() =>
-      `<tr>${Array(12).fill('').map(() => `<td><div class="skeleton" style="width:${55+Math.random()*40}%"></div></td>`).join('')}</tr>`
+      `<tr>${Array(10).fill('').map(() => `<td><div class="skeleton" style="width:${55+Math.random()*40}%"></div></td>`).join('')}</tr>`
     ).join('');
     document.getElementById('emptyState').style.display = 'none';
   }
 
-  // ── Sorting ────────────────────────────────────────────────
+  // ── Sorting ──────────────────────────────────────────────────
   function setSort(col) {
     if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; } else { sortCol = col; sortDir = 'asc'; }
     document.querySelectorAll('th.sortable').forEach(th => {
       th.classList.remove('sort-asc', 'sort-desc');
-      const colMap = { date: 'Dato', type: 'Type', artist: 'Artist / Event', venue: 'Venue', status: 'Status' };
+      const colMap = { date:'Dato', type:'Type', artist:'Artist / Event', venue:'Venue', status:'Status' };
       if (th.textContent.trim().startsWith(colMap[col] || col)) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
     });
     renderTable();
@@ -1079,10 +890,10 @@
     });
   }
 
-  // ── Tab switching ──────────────────────────────────────────
+  // ── Tab switching ─────────────────────────────────────────────
   function switchTab(tab) {
     activeTab = tab;
-    document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    document.querySelectorAll('.nav-tab').forEach((t, i) => {
       const tabs = ['schedule','calendar','artists'];
       t.classList.toggle('active', tabs[i] === tab);
     });
@@ -1092,7 +903,7 @@
     if (tab === 'artists')  renderArtistStats();
   }
 
-  // ── Render table ───────────────────────────────────────────
+  // ── Render table ──────────────────────────────────────────────
   function renderTable() {
     const q     = (document.getElementById('search').value || '').toLowerCase();
     const body  = document.getElementById('tableBody');
@@ -1106,6 +917,7 @@
         [e.artist, e.venue, e.shooting, e.management, e.comment].join(' ').toLowerCase().includes(q);
       return matchType && matchStatus && matchSearch;
     });
+
     filtered = applySort(filtered);
 
     if (filtered.length === 0) {
@@ -1124,29 +936,22 @@
         const hasPhoto = !!(e.photo_url && e.photo_url.trim());
         const dotClass = hasPhoto ? 'has-photo' : 'no-photo';
         const dotTitle = hasPhoto ? 'Foto publisert ✓' : 'Ingen foto URL registrert';
-
         const photoCell = hasPhoto
           ? `<a href="${esc(e.photo_url)}" target="_blank" rel="noopener" class="photo-url-link" title="${esc(e.photo_url)}" onclick="event.stopPropagation()">🔗 Åpne</a>`
           : `<span style="opacity:0.3;font-size:11px">+</span>`;
-
         return `
         <tr>
-          <td class="td-photo-dot">
-            <span class="photo-dot ${dotClass}" title="${dotTitle}"></span>
-          </td>
+          <td class="td-photo-dot"><span class="photo-dot ${dotClass}" title="${dotTitle}"></span></td>
           <td>${e.date||'—'}</td>
           <td style="color:var(--muted)">${getDay(e.date)}</td>
           <td><span class="${typeClass(e.type)}">${esc(e.type)}</span></td>
-          <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="artist"
-            title="Klikk for å redigere"
+          <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="artist" title="Klikk for å redigere"
             onclick="quickEditText('${e.id}','artist',\`${(e.artist||'').replace(/`/g,"'")}\`)">
             <strong>${esc(e.artist)||'<span style="opacity:0.3">+</span>'}</strong></td>
-          <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="venue"
-            title="Klikk for å redigere"
+          <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="venue" title="Klikk for å redigere"
             onclick="quickEditText('${e.id}','venue',\`${(e.venue||'').replace(/`/g,"'")}\`)">
             ${esc(e.venue)||'<span style="opacity:0.3">+</span>'}</td>
-          <td class="editable-shooting" data-qe-id="${e.id}" data-qe-field="shooting"
-            title="Klikk for å redigere"
+          <td class="editable-shooting" data-qe-id="${e.id}" data-qe-field="shooting" title="Klikk for å redigere"
             onclick="quickEditShooting('${e.id}','${esc(e.shooting)}')">
             ${esc(e.shooting)||'<span style="opacity:0.3">+</span>'}</td>
           <td>${esc(e.management)}</td>
@@ -1154,8 +959,7 @@
             onclick="quickEditStatus('${e.id}','${esc(e.status)}')">
             <span class="badge ${badgeClass(e.status)}">${esc(e.status)}</span></td>
           <td class="editable-comment" data-qe-id="${e.id}" data-qe-field="comment"
-            style="max-width:160px;color:var(--muted);font-size:12px"
-            title="Klikk for å redigere"
+            style="max-width:160px;color:var(--muted);font-size:12px" title="Klikk for å redigere"
             onclick="quickEditComment('${e.id}',\`${(e.comment||'').replace(/`/g,"'")}\`)">
             ${esc(e.comment)||'<span style="opacity:0.3">+</span>'}</td>
           <td class="editable-photo-url td-photo-url" data-qe-id="${e.id}" data-qe-field="photo_url"
@@ -1179,19 +983,18 @@
     const tot = filtered.length;
     if (globalSearchMode) {
       const q = document.getElementById('search').value || '';
-      const counts = ['Søke','Har søkt','Akkred Ok','Ferdig'].map(s => filtered.filter(e=>e.status===s).length);
+      const counts = ['Søke','Har søkt','Akkred Ok','Ferdig'].map(s => filtered.filter(e => e.status === s).length);
       document.getElementById('stats').innerHTML = `
         <div class="stat"><span class="global-search-badge">🔍 Søker i alle år</span></div>
         <div class="stat">Treff: <strong style="color:var(--accent)">${tot}</strong></div>
         <div class="stat">Søke: <strong style="color:var(--accent)">${counts[0]}</strong></div>
         <div class="stat">Har søkt: <strong style="color:#5dade2">${counts[1]}</strong></div>
         <div class="stat">Akkred Ok: <strong style="color:#58d68d">${counts[2]}</strong></div>
-        <div class="stat">Ferdig: <strong>${counts[3]}</strong></div>
-      `;
+        <div class="stat">Ferdig: <strong>${counts[3]}</strong></div>`;
     } else {
       const total = events.length;
+      const counts = ['Søke','Har søkt','Akkred Ok','Ferdig'].map(s => events.filter(e => e.status === s).length);
       const withPhoto = events.filter(e => e.photo_url && e.photo_url.trim()).length;
-      const counts = ['Søke','Har søkt','Akkred Ok','Ferdig'].map(s => events.filter(e=>e.status===s).length);
       document.getElementById('stats').innerHTML = `
         <div class="stat">År: <strong style="color:var(--accent)">${selectedYear}</strong></div>
         <div class="stat">Totalt: <strong>${total}</strong>${tot !== total ? ` <span style="color:var(--muted)">(viser ${tot})</span>` : ''}</div>
@@ -1199,18 +1002,16 @@
         <div class="stat">Har søkt: <strong style="color:#5dade2">${counts[1]}</strong></div>
         <div class="stat">Akkred Ok: <strong style="color:#58d68d">${counts[2]}</strong></div>
         <div class="stat">Ferdig: <strong>${counts[3]}</strong></div>
-        <div class="stat">📷 Med foto: <strong style="color:#27ae60">${withPhoto}</strong> / ${total}</div>
-      `;
+        <div class="stat">📷 Foto publisert: <strong style="color:#27ae60">${withPhoto}</strong></div>`;
     }
   }
 
-  // ── Modal ──────────────────────────────────────────────────
+  // ── Modal ─────────────────────────────────────────────────────
   function openModal(id = null) {
     editId = id;
     const e = id ? events.find(x => x.id === id) : null;
     document.getElementById('modalTitle').textContent = id ? 'Rediger event' : `Legg til event – ${selectedYear}`;
-    const defaultDate = `${selectedYear}-01-01`;
-    document.getElementById('f-date').value       = e?.date       || defaultDate;
+    document.getElementById('f-date').value       = e?.date       || `${selectedYear}-01-01`;
     document.getElementById('f-type').value       = e?.type       || 'Konsert';
     document.getElementById('f-artist').value     = e?.artist     || '';
     document.getElementById('f-venue').value      = e?.venue      || '';
@@ -1226,11 +1027,10 @@
   function closeModal() { document.getElementById('overlay').classList.remove('open'); editId = null; }
   function closeOnBackdrop(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
-  // ── Save ───────────────────────────────────────────────────
+  // ── Save ──────────────────────────────────────────────────────
   async function saveEvent() {
     const artist = document.getElementById('f-artist').value.trim();
     if (!artist) { showToast('Vennligst fyll inn Artist / Event.', true); return; }
-
     const payload = {
       date:       document.getElementById('f-date').value || null,
       type:       document.getElementById('f-type').value,
@@ -1242,26 +1042,22 @@
       comment:    document.getElementById('f-comment').value.trim(),
       photo_url:  document.getElementById('f-photo-url').value.trim(),
     };
-
     const saveBtn = document.getElementById('saveBtn');
     saveBtn.disabled = true; saveBtn.textContent = 'Lagrer…';
     setSyncState('saving', 'Lagrer…');
-
     let error;
     if (editId) { ({ error } = await db.from(TABLE).update(payload).eq('id', editId)); }
     else        { ({ error } = await db.from(TABLE).insert(payload)); }
-
     saveBtn.disabled = false; saveBtn.textContent = 'Lagre event';
     if (error) { setSyncState('error', 'Lagring feilet'); showToast('Feil ved lagring: ' + error.message, true); return; }
-
     setSyncState('online', 'Tilkoblet');
     showToast(editId ? '✓ Event oppdatert' : '✓ Event lagt til');
     closeModal();
-    await buildYearBar();
+    await buildYearDropdown();
     await loadEvents();
   }
 
-  // ── Delete ─────────────────────────────────────────────────
+  // ── Delete ────────────────────────────────────────────────────
   async function deleteEvent(id) {
     if (!confirm('Slette dette eventet?')) return;
     setSyncState('saving', 'Sletter…');
@@ -1269,11 +1065,11 @@
     if (error) { setSyncState('error', 'Sletting feilet'); showToast('Feil ved sletting: ' + error.message, true); return; }
     setSyncState('online', 'Tilkoblet');
     showToast('✓ Event slettet');
-    await buildYearBar();
+    await buildYearDropdown();
     await loadEvents();
   }
 
-  // ── Filters ────────────────────────────────────────────────
+  // ── Filters ───────────────────────────────────────────────────
   function setFilter(val, btn) {
     filterType = val;
     document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
@@ -1283,17 +1079,19 @@
 
   function setStatusFilter(val, btn) {
     if (filterStatus === val) { filterStatus = null; btn.classList.remove('active'); }
-    else { filterStatus = val; document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+    else {
+      filterStatus = val;
+      document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
     renderTable();
   }
 
-  // ── Export CSV ─────────────────────────────────────────────
+  // ── Export CSV ────────────────────────────────────────────────
   function exportCSV() {
     const headers = ['Dato','Dag','Type','Artist/Event','Venue','Foto for','Management','Status','Kommentar','Foto URL'];
-    const rows = events.map(e => [
-      e.date, getDay(e.date), e.type, e.artist, e.venue,
-      e.shooting, e.management, e.status, e.comment, e.photo_url
-    ].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
+    const rows = events.map(e => [e.date, getDay(e.date), e.type, e.artist, e.venue, e.shooting, e.management, e.status, e.comment, e.photo_url]
+      .map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
     const csv = [headers.join(','), ...rows].join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -1302,22 +1100,22 @@
     showToast(`✓ CSV eksportert (${selectedYear})`);
   }
 
-  // ── Keyboard shortcuts ─────────────────────────────────────
+  // ── Keyboard shortcuts ────────────────────────────────────────
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModal();
     if (e.key === 'n' && !e.ctrlKey && !e.metaKey &&
-        document.activeElement.tagName !== 'INPUT' &&
-        document.activeElement.tagName !== 'TEXTAREA') openModal();
+        document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') openModal();
     if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.ctrlKey && !e.metaKey &&
-        document.activeElement.tagName !== 'INPUT' &&
-        document.activeElement.tagName !== 'TEXTAREA') {
-      const idx = YEARS.indexOf(selectedYear);
-      if (e.key === 'ArrowLeft'  && idx > 0)              selectYear(YEARS[idx - 1]);
-      if (e.key === 'ArrowRight' && idx < YEARS.length-1) selectYear(YEARS[idx + 1]);
+        document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      const sel = document.getElementById('yearSelect');
+      const opts = Array.from(sel.options).map(o => parseInt(o.value));
+      const idx  = opts.indexOf(selectedYear);
+      if (e.key === 'ArrowLeft'  && idx > 0)            selectYear(opts[idx - 1]);
+      if (e.key === 'ArrowRight' && idx < opts.length-1) selectYear(opts[idx + 1]);
     }
   });
 
-  // ── Import ─────────────────────────────────────────────────
+  // ── Import ────────────────────────────────────────────────────
   let parsedImportRows = [];
 
   function openImport() {
@@ -1356,7 +1154,8 @@
     if (lines.length === 0) { countEl.innerHTML = ''; previewEl.style.display = 'none'; document.getElementById('importBtn').disabled = true; }
     else {
       const invalid = lines.length - parsedImportRows.length;
-      countEl.innerHTML = `<strong>${parsedImportRows.length}</strong> gyldige linjer klare for import` + (invalid > 0 ? ` · <span style="color:var(--danger)">${invalid} ugyldige ignoreres</span>` : '');
+      countEl.innerHTML = `<strong>${parsedImportRows.length}</strong> gyldige linjer klare for import` +
+        (invalid > 0 ? ` · <span style="color:var(--danger)">${invalid} ugyldige ignoreres</span>` : '');
       previewEl.style.display = 'block';
       document.getElementById('importBtn').disabled = parsedImportRows.length === 0;
     }
@@ -1372,7 +1171,7 @@
     btn.disabled = true; btn.textContent = 'Importerer…';
     progWrap.style.display = 'block';
     setSyncState('saving', 'Importerer…');
-    const payload = parsedImportRows.map(r => ({ date: r.date, artist: r.artist, type, status, venue: r.venue || '', shooting: '', management: '', comment: '', photo_url: '' }));
+    const payload = parsedImportRows.map(r => ({ date: r.date, artist: r.artist, type, status, venue: r.venue || '', shooting: '', management: '', comment: '' }));
     const BATCH = 50; let imported = 0; let failed = 0;
     for (let i = 0; i < payload.length; i += BATCH) {
       const batch = payload.slice(i, i + BATCH);
@@ -1384,28 +1183,29 @@
     setSyncState('online', 'Tilkoblet');
     if (failed > 0) { showToast(`Importert ${imported}, ${failed} feilet.`, true); } else { showToast(`✓ ${imported} events importert`); }
     closeImport();
-    await buildYearBar();
+    await buildYearDropdown();
     await loadEvents();
   }
 
-  // ── Dark / light mode ──────────────────────────────────────
+  // ── Dark / light mode ─────────────────────────────────────────
   function toggleTheme() {
     const isLight = document.documentElement.classList.toggle('light');
     document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   }
   (function applyStoredTheme() {
-    if (localStorage.getItem('theme') === 'light') { document.documentElement.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.add('light');
+      document.getElementById('themeBtn').textContent = '☀️';
+    }
   })();
 
-  // ── Notifications ──────────────────────────────────────────
+  // ── Notifications ─────────────────────────────────────────────
   let notifOpen = false;
-
   function toggleNotifications() {
     notifOpen = !notifOpen;
     document.getElementById('notifPanel').style.display = notifOpen ? 'block' : 'none';
   }
-
   document.addEventListener('click', e => {
     const panel = document.getElementById('notifPanel');
     const bell  = document.getElementById('bellBtn');
@@ -1420,18 +1220,15 @@
       const d = new Date(e.date + 'T12:00:00');
       return d >= today && d <= cutoff && (e.status === 'Søke' || e.status === 'Har søkt');
     }).sort((a,b) => a.date.localeCompare(b.date));
-
     const bell  = document.getElementById('bellBtn');
     const badge = document.getElementById('notifBadge');
     const list  = document.getElementById('notifList');
     bell.style.display = '';
-
     if (pending.length === 0) {
       badge.style.display = 'none';
       list.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:12px;text-align:center">Ingen kommende events mangler akkreditering 👍</div>';
       return;
     }
-
     badge.style.cssText = 'display:flex;position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center;';
     badge.textContent = pending.length > 9 ? '9+' : pending.length;
     list.innerHTML = pending.map(e => {
@@ -1442,9 +1239,8 @@
     }).join('');
   }
 
-  // ── Year summary ───────────────────────────────────────────
+  // ── Year summary ──────────────────────────────────────────────
   let summaryOpen = false;
-
   function toggleSummary() {
     summaryOpen = !summaryOpen;
     document.getElementById('yearSummary').classList.toggle('open', summaryOpen);
@@ -1457,49 +1253,43 @@
     document.getElementById('summaryYear').textContent = selectedYear;
     toggle.style.display = evts.length === 0 ? 'none' : 'flex';
     if (evts.length === 0) { box.classList.remove('open'); summaryOpen = false; return; }
-
-    const types    = allTypes().map(t => t.name);
+    const types    = ['Konsert','Fotball','OsloPride','Annet'];
     const statuses = ['Søke','Har søkt','Akkred Ok','Ferdig'];
+    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
     const total = evts.length;
     const pct   = n => Math.round((n / total) * 100);
-    const typeCounts   = Object.fromEntries(types.map(t => [t, evts.filter(e => e.type === t).length]));
+    const typeCounts   = Object.fromEntries(types.map(t   => [t, evts.filter(e => e.type   === t).length]));
     const statusCounts = Object.fromEntries(statuses.map(s => [s, evts.filter(e => e.status === s).length]));
-    const months = Array.from({length:12}, (_,i) => { const m = String(i+1).padStart(2,'0'); return evts.filter(e => e.date && e.date.substring(5,7) === m).length; });
+    const months = Array.from({length:12}, (_,i) => {
+      const m = String(i+1).padStart(2,'0');
+      return evts.filter(e => e.date && e.date.substring(5,7) === m).length;
+    });
     const maxM = Math.max(...months, 1);
     const monthNames = ['Jan','Feb','Mar','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Des'];
     const successes = evts.filter(e => e.status === 'Akkred Ok' || e.status === 'Ferdig').length;
     const rate = total > 0 ? Math.round((successes / total) * 100) : 0;
-
     box.innerHTML = `
       <div class="summary-grid">
         <div class="summary-block">
           <h4>Per type</h4>
-          ${types.map(t => `
-            <div class="summary-row"><span style="color:${typeColor(t)}">${t}</span><strong>${typeCounts[t]||0}</strong></div>
-            <div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(typeCounts[t]||0)}%;background:${typeColor(t)}"></div></div>
-          `).join('')}
+          ${types.map(t => `<div class="summary-row"><span style="color:${typeColors[t]}">${t}</span><strong>${typeCounts[t]}</strong></div><div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(typeCounts[t])}%;background:${typeColors[t]}"></div></div>`).join('')}
         </div>
         <div class="summary-block">
           <h4>Per status</h4>
           ${statuses.map(s => `<div class="summary-row"><span>${s}</span><strong>${statusCounts[s]}</strong></div>`).join('')}
-          <div style="margin-top:10px;font-size:12px;color:var(--muted)">Suksessrate: <strong style="color:#58d68d">${rate}%</strong></div>
+          <div style="margin-top:10px;font-size:12px;color:var(--muted)">Suksessrate: <strong style="color:#58d68d">${rate}%</strong><span style="font-size:11px"> (Akkred Ok + Ferdig)</span></div>
         </div>
         <div class="summary-block">
           <h4>Per måned</h4>
           <div style="display:flex;align-items:flex-end;gap:5px;height:60px">
-            ${months.map((n,i) => `
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-                <div style="font-size:9px;color:var(--muted)">${n>0?n:''}</div>
-                <div style="width:16px;background:var(--accent);border-radius:2px 2px 0 0;height:${Math.round((n/maxM)*48)+4}px;opacity:${n>0?1:0.2}"></div>
-                <div style="font-size:9px;color:var(--muted)">${monthNames[i]}</div>
-              </div>`).join('')}
+            ${months.map((n,i) => `<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:9px;color:var(--muted)">${n>0?n:''}</div><div style="width:16px;background:var(--accent);border-radius:2px 2px 0 0;height:${Math.round((n/maxM)*48)+4}px;opacity:${n>0?1:0.2}"></div><div style="font-size:9px;color:var(--muted)">${monthNames[i]}</div></div>`).join('')}
           </div>
         </div>
       </div>`;
     if (summaryOpen) box.classList.add('open');
   }
 
-  // ── Total summary ──────────────────────────────────────────
+  // ── Total summary ─────────────────────────────────────────────
   function toggleTotalSummary() {
     totalSummaryOpen = !totalSummaryOpen;
     document.getElementById('totalSummary').classList.toggle('open', totalSummaryOpen);
@@ -1509,57 +1299,42 @@
   function renderTotalSummary() {
     const box = document.getElementById('totalSummary');
     if (!box) return;
-    const types = allTypes();
+    const types      = ['Konsert','Fotball','OsloPride','Annet'];
+    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
     const totalEvents = Object.values(globalTypeCounts).reduce((a,b) => a+b, 0);
     const pct = (n, tot) => tot > 0 ? Math.round((n / tot) * 100) : 0;
     const venueEntries = Object.entries(globalVenueCounts).filter(([k]) => k).sort((a,b) => b[1]-a[1]).slice(0,15);
     const maxVenue = venueEntries.length > 0 ? venueEntries[0][1] : 1;
     const shootEntries = Object.entries(globalShootingCounts).filter(([k]) => k).sort((a,b) => b[1]-a[1]);
     const maxShoot = shootEntries.length > 0 ? shootEntries[0][1] : 1;
-
     box.innerHTML = `
       <div class="summary-grid">
         <div class="summary-block">
-          <h4>Per type – alle år (${totalEvents} totalt)</h4>
-          ${types.map(t => `
-            <div class="summary-row"><span style="color:${t.color}">${t.name}</span><strong>${globalTypeCounts[t.name]||0}</strong></div>
-            <div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(globalTypeCounts[t.name]||0, totalEvents)}%;background:${t.color}"></div></div>
-          `).join('')}
+          <h4>Per type – alle år, tidligere events (${totalEvents} totalt)</h4>
+          ${types.map(t => `<div class="summary-row"><span style="color:${typeColors[t]}">${t}</span><strong>${globalTypeCounts[t]}</strong></div><div class="summary-bar-wrap"><div class="summary-bar" style="width:${pct(globalTypeCounts[t], totalEvents)}%;background:${typeColors[t]}"></div></div>`).join('')}
         </div>
         <div class="summary-block" style="min-width:260px">
           <h4>Topp venues</h4>
-          ${venueEntries.length === 0 ? '<div style="color:var(--muted);font-size:12px">Ingen data</div>' :
-            venueEntries.map(([v, n]) => `
-              <div class="chart-bar-row">
-                <div class="chart-bar-label">${v}</div>
-                <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round((n/maxVenue)*100)}%"></div></div>
-                <div class="chart-bar-count">${n}</div>
-              </div>`).join('')}
+          ${venueEntries.length === 0 ? '<div style="color:var(--muted);font-size:12px">Ingen data</div>'
+            : venueEntries.map(([v,n]) => `<div class="chart-bar-row"><div class="chart-bar-label">${v}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round((n/maxVenue)*100)}%"></div></div><div class="chart-bar-count">${n}</div></div>`).join('')}
         </div>
         <div class="summary-block" style="min-width:220px">
           <h4>Foto for</h4>
-          ${shootEntries.length === 0 ? '<div style="color:var(--muted);font-size:12px">Ingen data</div>' :
-            shootEntries.map(([s, n]) => `
-              <div class="chart-bar-row">
-                <div class="chart-bar-label">${s}</div>
-                <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round((n/maxShoot)*100)}%;background:#5dade2"></div></div>
-                <div class="chart-bar-count">${n}</div>
-              </div>`).join('')}
+          ${shootEntries.length === 0 ? '<div style="color:var(--muted);font-size:12px">Ingen data</div>'
+            : shootEntries.map(([s,n]) => `<div class="chart-bar-row"><div class="chart-bar-label">${s}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round((n/maxShoot)*100)}%;background:#5dade2"></div></div><div class="chart-bar-count">${n}</div></div>`).join('')}
         </div>
       </div>`;
     if (totalSummaryOpen) box.classList.add('open');
   }
 
-  // ── Quick edit ─────────────────────────────────────────────
+  // ── Quick edit ────────────────────────────────────────────────
   async function quickEditStatus(id, currentStatus) {
     const statuses = ['Søke','Har søkt','Akkred Ok','Ferdig'];
-    const sel = document.createElement('select');
-    sel.className = 'qe-select';
+    const sel = document.createElement('select'); sel.className = 'qe-select';
     statuses.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; if (s === currentStatus) o.selected = true; sel.appendChild(o); });
     const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="status"]`);
     if (!cell) return;
-    const original = cell.innerHTML;
-    cell.innerHTML = ''; cell.appendChild(sel); sel.focus();
+    const original = cell.innerHTML; cell.innerHTML = ''; cell.appendChild(sel); sel.focus();
     const save = async () => {
       const newStatus = sel.value;
       if (newStatus === currentStatus) { cell.innerHTML = original; return; }
@@ -1567,8 +1342,7 @@
       const { error } = await db.from(TABLE).update({ status: newStatus }).eq('id', id);
       setSyncState('online', 'Tilkoblet');
       if (error) { showToast('Feil: ' + error.message, true); cell.innerHTML = original; return; }
-      showToast('✓ Status oppdatert');
-      await loadEvents();
+      showToast('✓ Status oppdatert'); await loadEvents();
     };
     sel.addEventListener('change', save);
     sel.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== sel) cell.innerHTML = original; }, 150));
@@ -1635,7 +1409,7 @@
     sel.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== sel) cell.innerHTML = original; }, 150));
   }
 
-  // ── NEW: Quick edit photo URL ──────────────────────────────
+  // ── Quick edit photo URL ──────────────────────────────────
   async function quickEditPhotoUrl(id, currentVal) {
     const cell = document.querySelector(`[data-qe-id="${id}"][data-qe-field="photo_url"]`);
     if (!cell) return;
@@ -1657,7 +1431,7 @@
     inp.addEventListener('blur', () => setTimeout(save, 150));
   }
 
-  // ── Duplicate ──────────────────────────────────────────────
+  // ── Duplicate event ───────────────────────────────────────────
   async function duplicateEvent(id) {
     const e = events.find(x => x.id === id);
     if (!e) return;
@@ -1667,11 +1441,11 @@
     if (error) { setSyncState('error', 'Feil'); showToast('Feil ved duplisering: ' + error.message, true); return; }
     setSyncState('online', 'Tilkoblet');
     showToast('✓ Event duplisert');
-    await buildYearBar();
+    await buildYearDropdown();
     await loadEvents();
   }
 
-  // ── Calendar ───────────────────────────────────────────────
+  // ── Calendar ──────────────────────────────────────────────────
   async function loadCalendarEvents() {
     setSyncState('saving', 'Laster kalender…');
     const from = `${calYear}-01-01`; const to = `${calYear}-12-31`;
@@ -1688,14 +1462,14 @@
     const grid = document.getElementById('calGrid');
     const headers = Array.from(grid.children).slice(0, 7);
     grid.innerHTML = ''; headers.forEach(h => grid.appendChild(h));
-    const today = new Date(); today.setHours(0,0,0,0);
+    const today    = new Date(); today.setHours(0,0,0,0);
     const firstDay = new Date(calYear, calMonth, 1);
     const lastDay  = new Date(calYear, calMonth + 1, 0);
     let startDow = firstDay.getDay() - 1; if (startDow < 0) startDow = 6;
     const totalCells = Math.ceil((startDow + lastDay.getDate()) / 7) * 7;
     const eventsThisMonth = calAllEvents.filter(e => {
       if (!e.date) return false;
-      const [y, m] = e.date.split('-').map(Number);
+      const [y,m] = e.date.split('-').map(Number);
       return y === calYear && m === calMonth + 1;
     });
     for (let i = 0; i < totalCells; i++) {
@@ -1703,15 +1477,13 @@
       const d = new Date(calYear, calMonth, dayOffset);
       const cell = document.createElement('div');
       cell.className = 'cal-day' + (dayOffset < 1 || dayOffset > lastDay.getDate() ? ' other-month' : '') + (d.getTime() === today.getTime() ? ' today' : '');
-      const dayNum = document.createElement('div'); dayNum.className = 'cal-day-num'; dayNum.textContent = d.getDate();
-      cell.appendChild(dayNum);
+      const dayNum = document.createElement('div'); dayNum.className = 'cal-day-num'; dayNum.textContent = d.getDate(); cell.appendChild(dayNum);
       const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       eventsThisMonth.filter(e => e.date === dateStr).forEach(e => {
         const ev = document.createElement('div');
         const sc = { 'Akkred Ok':'status-ok','Ferdig':'status-done','Har søkt':'status-applied' }[e.status] || '';
-        ev.className = `cal-event ${sc}`;
-        ev.textContent = (e.photo_url ? '📷 ' : '') + (e.artist || '—');
-        ev.title = `${e.artist} @ ${e.venue||'?'} [${e.status}]${e.photo_url ? ' — Foto publisert' : ''}`;
+        ev.className = `cal-event ${sc}`; ev.textContent = e.artist || '—';
+        ev.title = `${e.artist} @ ${e.venue||'?'} [${e.status}]`;
         ev.onclick = () => { switchTab('schedule'); selectYear(calYear); setTimeout(() => openModal(e.id), 400); };
         cell.appendChild(ev);
       });
@@ -1723,7 +1495,7 @@
   function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } if (activeTab === 'calendar') loadCalendarEvents(); }
   function calToday() { const now = new Date(); calYear = now.getFullYear(); calMonth = now.getMonth(); if (activeTab === 'calendar') loadCalendarEvents(); }
 
-  // ── Artist stats ───────────────────────────────────────────
+  // ── Artist stats ──────────────────────────────────────────────
   async function renderArtistStats() {
     setSyncState('saving', 'Laster artistdata…');
     const PAGE = 1000; let allData = []; let from = 0; let keepGoing = true;
@@ -1739,46 +1511,35 @@
       const a = e.artist.trim(); counts[a] = (counts[a] || 0) + 1;
       if (!typeFor[a]) typeFor[a] = e.type;
     });
-    const sorted   = Object.entries(counts).sort((a,b) => b[1]-a[1]);
-    const top3     = sorted.slice(0, 3);
-    const rest     = sorted.slice(3, 50);
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+    const top3 = sorted.slice(0,3); const rest = sorted.slice(3,50);
     const maxCount = sorted.length > 0 ? sorted[0][1] : 1;
-    const typeColors = Object.fromEntries(allTypes().map(t => [t.name, t.color]));
-    const medals = ['🥇','🥈','🥉'];
-    const barClasses = ['gold','silver','bronze'];
-    const heights = [120, 90, 70];
-    const podiumOrder = [1, 0, 2];
-    document.getElementById('artistPodium').innerHTML = top3.length === 0 ? '<div style="color:var(--muted)">Ingen data ennå.</div>' :
-      podiumOrder.filter(i => top3[i]).map(i => {
-        const [name, count] = top3[i];
-        return `<div class="podium-item">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">${count} gang${count>1?'er':''}</div>
-          <div class="podium-bar ${barClasses[i]}" style="height:${heights[i]}px">${medals[i]}</div>
-          <div class="podium-label" style="color:${typeColors[typeFor[name]]||'var(--text)'}">${esc(name)}</div>
-        </div>`;
-      }).join('');
+    const typeColors = { Konsert:'#e056fd', Fotball:'#00cec9', OsloPride:'#ff6eb4', Annet:'#a0aec0' };
+    const medals = ['🥇','🥈','🥉']; const barClasses = ['gold','silver','bronze']; const heights = [120,90,70];
+    const podiumOrder = [1,0,2];
+    document.getElementById('artistPodium').innerHTML = top3.length === 0
+      ? '<div style="color:var(--muted)">Ingen data ennå.</div>'
+      : podiumOrder.filter(i => top3[i]).map(i => {
+          const [name, count] = top3[i];
+          return `<div class="podium-item"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">${count} gang${count>1?'er':''}</div><div class="podium-bar ${barClasses[i]}" style="height:${heights[i]}px">${medals[i]}</div><div class="podium-label" style="color:${typeColors[typeFor[name]]||'var(--text)'}">${esc(name)}</div></div>`;
+        }).join('');
     document.getElementById('artistList').innerHTML = rest.length === 0 ? '' : `
       <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:18px">
-        ${rest.map(([name, count], idx) => `
-          <div class="artist-bar-row">
-            <div class="artist-rank">${idx + 4}</div>
-            <div class="artist-name" style="color:${typeColors[typeFor[name]]||'var(--text)'}" title="${esc(name)}">${esc(name)}</div>
-            <div class="artist-track"><div class="artist-fill" style="width:${Math.round((count/maxCount)*100)}%"></div></div>
-            <div class="artist-count">${count}</div>
-          </div>`).join('')}
+        ${rest.map(([name,count],idx) => `<div class="artist-bar-row"><div class="artist-rank">${idx+4}</div><div class="artist-name" style="color:${typeColors[typeFor[name]]||'var(--text)'}" title="${esc(name)}">${esc(name)}</div><div class="artist-track"><div class="artist-fill" style="width:${Math.round((count/maxCount)*100)}%"></div></div><div class="artist-count">${count}</div></div>`).join('')}
       </div>`;
   }
 
-  // ── Init ───────────────────────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────
   async function init() {
-    await loadTypesFromSupabase();   // load custom types first
-    await buildYearBar();
+    await buildYearDropdown();
     await loadEvents();
   }
 
+  // Enter key in login form
   document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
   document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPassword').focus(); });
 
+  // Check existing session on page load
   (async () => {
     const { data: { session } } = await db.auth.getSession();
     if (session) { showLoginScreen(false); await init(); }
