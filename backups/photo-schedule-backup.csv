@@ -1,4 +1,4 @@
-# PhotoSchedule backup — 2026-07-20 — 1153 rows
+# PhotoSchedule backup — 2026-07-27 — 1153 rows
 date,type,artist,venue,shooting,management,status,comment
 2009-08-19,Sykling,Oslo Grand Prix,Karl Johans gate,Annet,,Ferdig,
 2010-06-16,Konsert,Levi Henriksen og Thomas Mårud,Rockefeller,Annet,,Ferdig,Einar Einarsson 60 år
@@ -273,36 +273,36 @@ date,type,artist,venue,shooting,management,status,comment
 2018-07-29,Konsert,Darling West,Månefestivalen,Festivalguide,,Ferdig,
 2018-07-29,Konsert,Humle,Månefestivalen,Festivalguide,,Ferdig,
 2018-09-14,Konsert,Humle,Utenfor Fredrikstad Bibliotek,Annet,,Ferdig,
-2019-05-24,Konsert,Ghost AvenueRock,Spydeberg Rock,Festivalguide,,Ferdig,
+2019-05-24,Konsert,Bigbang,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-24,Konsert,Humle,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-24,Konsert,Staut,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-24,Konsert,TNT,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-24,Konsert,Bare Egil Band,Spydeberg Rock,Festivalguide,,Ferdig,
-2019-05-24,Konsert,Bigbang,Spydeberg Rock,Festivalguide,,Ferdig,
+2019-05-24,Konsert,Ghost AvenueRock,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-24,Konsert,Valentourettes,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-24,Konsert,Dårlig Hjort,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-24,Konsert,Skam,Spydeberg Rock,Festivalguide,,Ferdig,
-2019-05-25,Konsert,Bjelleklang,Spydeberg Rock,Festivalguide,,Ferdig,
+2019-05-25,Konsert,Stavangerkameratene,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-25,Konsert,Signe,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-25,Konsert,Onkel P,Spydeberg Rock,Festivalguide,,Ferdig,
+2019-05-25,Konsert,Bjelleklang,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-25,Konsert,Rotlaus,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-25,Konsert,Obsklassen,Spydeberg Rock,Festivalguide,,Ferdig,
-2019-05-25,Konsert,Stavangerkameratene,Spydeberg Rock,Festivalguide,,Ferdig,
 2019-05-27,Konsert,Ruben,Idyll,Festivalguide,,Ferdig,
 2019-06-21,Konsert,OnklP,Idyll,Festivalguide,,Ferdig,
 2019-06-21,Konsert,Arif,Idyll,Festivalguide,,Ferdig,
 2019-06-21,Konsert,Julie Bergan,Idyll,Festivalguide,,Ferdig,
 2019-06-21,Konsert,Matoma,Idyll,Festivalguide,,Ferdig,
 2019-06-21,Konsert,Sushi x Kobe,Idyll,Festivalguide,,Ferdig,
+2019-06-21,Konsert,DeLillos,Idyll,Festivalguide,,Ferdig,
 2019-06-21,Konsert,"Lind, Nilsen, Fuentes, Holm ",Idyll,Festivalguide,,Ferdig,
-2019-06-21,Konsert,De Lillos,Idyll,Festivalguide,,Ferdig,
+2019-06-22,Konsert,Postgirobygget,Idyll,Festivalguide,,Ferdig,
 2019-06-22,Konsert,Celine,Idyll,Festivalguide,,Ferdig,
-2019-06-22,Konsert,Raga Rockers,Idyll,Festivalguide,,Ferdig,
 2019-06-22,Konsert,Ruben,Idyll,Festivalguide,,Ferdig,
+2019-06-22,Konsert,Raga Rockers,Idyll,Festivalguide,,Ferdig,
+2019-06-22,Konsert,Hkeem,Idyll,Festivalguide,,Ferdig,
 2019-06-22,Konsert,Erik & Kriss,Idyll,Festivalguide,,Ferdig,
 2019-06-22,Konsert,Aurora,Idyll,Festivalguide,,Ferdig,
-2019-06-22,Konsert,Hkeem,Idyll,Festivalguide,,Ferdig,
-2019-06-22,Konsert,Postgirobygget,Idyll,Festivalguide,,Ferdig,
 2019-06-25,Konsert,Heave Blood & Die,Tons of Rock,Tons of Rock,,Ferdig,
 2019-06-27,Konsert,Ulver,Tons of Rock,Tons of Rock,,Ferdig,
 2019-06-27,Konsert,Drokick Murphys,Tons of Rock,Tons of Rock,,Ferdig,
@@ -567,11 +567,11 @@ date,type,artist,venue,shooting,management,status,comment
 2022-08-13,Konsert,Aurora,Øya,Festivalguide,,Ferdig,
 2022-08-13,Konsert,Alcest,Øya,Festivalguide,,Ferdig,
 2022-08-13,Konsert,AJ Tracey,Øya,Festivalguide,,Ferdig,
-2022-08-19,Konsert,After Eden - Blakerfest,Blaker Skanse,Jørgen Kirsebom,,Ferdig,Blakerfest
-2022-08-19,Konsert,Sari Schorr,Blaker Skanse,Jørgen Kirsebom,,Ferdig,Blakerfest
 2022-08-19,Konsert,Splitter Pine,Blaker Skanse,Jørgen Kirsebom,,Ferdig,Blakerfest
+2022-08-19,Konsert,Sari Schorr,Blaker Skanse,Jørgen Kirsebom,,Ferdig,Blakerfest
 2022-08-19,Konsert,After Eden,Blaker Skanse,Jørgen Kirsebom,,Ferdig,Blakerfest
 2022-08-19,Konsert,Trang Fødsel,Blaker Skanse,Jørgen Kirsebom,,Ferdig,Blakerfest
+2022-08-19,Konsert,After Eden - Blakerfest,Blaker Skanse,Jørgen Kirsebom,,Ferdig,Blakerfest
 2022-10-02,Konsert,Biffy Clyro,John Dee,MH,,Ferdig,
 2022-10-04,Konsert,FU MANCHU,Rockefeller,MH,,Ferdig,
 2022-10-04,Konsert,Electric Citizen,John Dee,MH,,Ferdig,
@@ -973,9 +973,9 @@ date,type,artist,venue,shooting,management,status,comment
 2025-06-26,Konsert,Green Day,Tons of Rock,Tons of Rock,,Ferdig,
 2025-06-26,Konsert,Bleed from Within,Tons of Rock,Tons of Rock,,Ferdig,
 2025-06-26,Konsert,Dead Poet Society,Tons of Rock,Tons of Rock,,Ferdig,
-2025-06-27,Konsert,Within Temptation,Tons of Rock,Tons of Rock,,Ferdig,
-2025-06-27,Konsert,Finntroll,Tons of Rock,Tons of Rock,,Ferdig,
 2025-06-27,Konsert,Kaizers Orchestra,Tons of Rock,Tons of Rock,,Ferdig,
+2025-06-27,Konsert,Finntroll,Tons of Rock,Tons of Rock,,Ferdig,
+2025-06-27,Konsert,Within Temptation,Tons of Rock,Tons of Rock,,Ferdig,
 2025-06-27,Konsert,Dimmu Borgir,Tons of Rock,Tons of Rock,,Ferdig,
 2025-06-27,Konsert,Kat von D,Tons of Rock,Tons of Rock,,Ferdig,
 2025-06-27,Konsert,Deafheaven,Tons of Rock,Tons of Rock,,Ferdig,
