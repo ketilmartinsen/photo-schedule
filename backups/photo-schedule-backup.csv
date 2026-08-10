@@ -1,4 +1,4 @@
-# PhotoSchedule backup — 2026-08-03 — 1153 rows
+# PhotoSchedule backup — 2026-08-10 — 1153 rows
 date,type,artist,venue,shooting,management,status,comment
 2009-08-19,Sykling,Oslo Grand Prix,Karl Johans gate,Annet,,Ferdig,
 2010-06-16,Konsert,Levi Henriksen og Thomas Mårud,Rockefeller,Annet,,Ferdig,Einar Einarsson 60 år
@@ -886,7 +886,7 @@ date,type,artist,venue,shooting,management,status,comment
 2024-09-06,Konsert,Susanne Sundfør,Spektrum,Blezt,,Ferdig,
 2024-09-25,Fotball,Våleranga - Anderlecht - Womens Champion League,Unity,Gonzales,,Ferdig,
 2024-10-10,Fotball,Norge - Slovenia,Ullevaal,Gonzales,,Ferdig,
-2024-10-13,Friidrett,NM Terrengl��p lang løype 2024 - Ekerberg Oslo,Ekeberg,Gonzales,,Ferdig,
+2024-10-13,Friidrett,NM Terrengløp lang løype 2024 - Ekerberg Oslo,Ekeberg,Gonzales,,Ferdig,
 2024-10-19,Konsert,Soverereign,Rockefeller,Blezt,,Ferdig,
 2024-10-24,Konsert,Enslaved,Rockefeller,Blezt,,Ferdig,
 2024-11-06,Konsert,Jason Isbell and The 400 Unit,Sentrum Scene,Blezt,,Ferdig,
